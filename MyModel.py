@@ -91,11 +91,11 @@ class Classification:
 
 
 
-    
+
     #==========================================类变量==================================================
     #标签   
     # __label_list = ['0', '1', '2', '3', '4', '5', '6']
-    __label_map ={'0': '快乐', '1': '害怕', '2': '生气', '3': '惊喜', '4': '喜爱', '5': '厌恶', '6': '难过'}
+    __label_map ={'0': '快乐', '1': '恐惧', '2': '愤怒', '3': '惊讶', '4': '喜爱', '5': '厌恶', '6': '悲伤'}
 
     #调用ppnlp.transformers.BertTokenizer进行数据处理，tokenizer可以把原始输入文本转化成模型model可接受的输入数据格式。
     __tokenizer = ppnlp.transformers.BertTokenizer.from_pretrained("bert-base-chinese")
