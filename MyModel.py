@@ -17,12 +17,12 @@ class Classification:
     def __init__(self,load_path="bert_model") :
         #  加载：
         # load_path=model_path
-        self.load_path=load_path
-        self.model=self.model.from_pretrained(self.load_path)
+        self.__load_path=load_path
+        self.__model=self.__model.from_pretrained(self.__load_path)
 
-        self.tokenizer=self.tokenizer.from_pretrained(self.load_path)
+        self.__tokenizer=self.__tokenizer.from_pretrained(self.__load_path)
         #数据预处理
-    def convert_example(self,example,tokenizer,label_list,max_seq_length=256,is_test=False):
+    def __convert_example(self,example,tokenizer,label_list,max_seq_length=256,is_test=False):
         if is_test:
             text = example
         else:
@@ -47,27 +47,14 @@ class Classification:
             return input_ids, segment_ids
 
 
-    #数据迭代器构造方法
-    def create_dataloader(self,dataset, trans_fn=None, mode='train', batch_size=1, use_gpu=True, pad_token_id=0, batchify_fn=None):
-        if trans_fn:
-            # dataset = dataset.apply(trans_fn, lazy=True)
-            # dataset = paddle.io.Dataset.from_list(dataset)
-            dataset = dataset.map(trans_fn, lazy=True)
-
-        if mode == 'train' and use_gpu:
-            sampler = paddle.io.DistributedBatchSampler(dataset=dataset, batch_size=batch_size, shuffle=True)
-        else:
-            shuffle = True if mode == 'train' else False #如果不是训练集，则不打乱顺序
-            sampler = paddle.io.BatchSampler(dataset=dataset, batch_size=batch_size, shuffle=shuffle) #生成一个取样器
-        dataloader = paddle.io.DataLoader(dataset, batch_sampler=sampler, return_list=True, collate_fn=batchify_fn)
-        return dataloader
+    
 
 
     #预测函数
-    def predict(self,model, data, tokenizer, label_map, batch_size=1):
+    def __predict(self,model, data, tokenizer, label_map, batch_size=1):
         examples = []
         for text in data:
-            input_ids, segment_ids = self.convert_example(text, tokenizer, label_list=label_map.values(),  max_seq_length=128, is_test=True)
+            input_ids, segment_ids = self.__convert_example(text, tokenizer, label_list=label_map.values(),  max_seq_length=128, is_test=True)
             examples.append((input_ids, segment_ids))
 
         batchify_fn = lambda samples, fn=Tuple(Pad(axis=0, pad_val=tokenizer.pad_token_id), Pad(axis=0, pad_val=tokenizer.pad_token_id)): fn(samples)
@@ -95,25 +82,28 @@ class Classification:
             results.extend(labels)
         return results
     
+    #对外接口
     def getPredictResult(self,data):
-        predictions = self.predict(self.model, data, self.tokenizer, self.label_map, batch_size=32)
-        for idx, text in enumerate(data):
-            print('预测文本{}:{} \n预测情绪: {}\n'.format(idx+1,text, predictions[idx]))
-    #==========================================类变量==================================================
-    #标签   
-    label_list = ['0', '1', '2', '3', '4', '5', '6']
-    label_map ={'0': '快乐', '1': '害怕', '2': '生气', '3': '惊喜', '4': '喜爱', '5': '厌恶', '6': '难过'}
-    #调用ppnlp.transformers.BertTokenizer进行数据处理，tokenizer可以把原始输入文本转化成模型model可接受的输入数据格式。
-    tokenizer = ppnlp.transformers.BertTokenizer.from_pretrained("bert-base-chinese")
-    #使用partial()来固定convert_example函数的tokenizer, label_list, max_seq_length, is_test等参数值
-    trans_fn = partial(convert_example, tokenizer=tokenizer, label_list=label_list, max_seq_length=128, is_test=False)
-    batchify_fn = lambda samples, fn=Tuple(Pad(axis=0,pad_val=tokenizer.pad_token_id), Pad(axis=0, pad_val=tokenizer.pad_token_id), Stack(dtype="int64")):[data for data in fn(samples)]
+        predictions = self.__predict(self.__model, data, self.__tokenizer, self.__label_map, batch_size=32)
+        return predictions
     
 
 
+
+
+    
+    #==========================================类变量==================================================
+    #标签   
+    # __label_list = ['0', '1', '2', '3', '4', '5', '6']
+    __label_map ={'0': '快乐', '1': '害怕', '2': '生气', '3': '惊喜', '4': '喜爱', '5': '厌恶', '6': '难过'}
+
+    #调用ppnlp.transformers.BertTokenizer进行数据处理，tokenizer可以把原始输入文本转化成模型model可接受的输入数据格式。
+    __tokenizer = ppnlp.transformers.BertTokenizer.from_pretrained("bert-base-chinese")
+ 
+    __load_path=''
     #加载预训练模型Bert用于文本分类任务的Fine-tune网络BertForSequenceClassification, 它在BERT模型后接了一个全连接层进行分类。
     #由于本任务中的情感分类是多分类问题，设定num_classes为7
-    model = ppnlp.transformers.BertForSequenceClassification.from_pretrained("bert-base-chinese", num_classes=7)
+    __model = ppnlp.transformers.BertForSequenceClassification.from_pretrained("bert-base-chinese", num_classes=7)
 
 
     
@@ -139,6 +129,6 @@ class Classification:
 # data = ['如果情绪有天气，我困在阴天里','好想离开这个世界','讨厌下雨天','下雨天好烦','下雨天可以睡懒觉','怎样的我能让你更想念']
 # label_map ={'0': '快乐', '1': '害怕', '2': '生气', '3': '惊喜', '4': '喜爱', '5': '厌恶', '6': '难过'}
 
-# predictions = predict(model, data, tokenizer, label_map, batch_size=32)
+# __predictions = __predict(model, data, tokenizer, label_map, batch_size=32)
 # for idx, text in enumerate(data):
-#     print('预测文本{}:{} \n预测情绪: {}\n'.format(idx+1,text, predictions[idx]))
+#     print('预测文本{}:{} \n预测情绪: {}\n'.format(idx+1,text, __predictions[idx]))
