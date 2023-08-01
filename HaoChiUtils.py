@@ -185,9 +185,12 @@ class DataAnalyzer:
 
     # 计算标签占比，输入为预测结果的列表，输出为标签:占比
     @classmethod
-    def calculate_label_proportions(self,predictions):
+    def calculate_label_proportions(self,predictions,label_list):
         # 创建一个空字典用于存储标签及其对应的数量
         predictions_dict = {}
+        #添加字典
+        for i in label_list:
+            predictions_dict[i]=0
         # 初始化总数量为0
         total_cnt = 0
         # 遍历预测结果列表
@@ -199,18 +202,18 @@ class DataAnalyzer:
             predictions_dict[prediction] += 1
             # 总数量加1
             total_cnt += 1
-        # 创建一个空字典用于存储标签及其对应的占比
+        # # 创建一个空字典用于存储标签及其对应的占比
         res_dict = {}
         # 遍历标签及其对应的数量
         for key, value in predictions_dict.items():
-            # 为每个标签创建一个子字典
-            res_dict[key] = {}
-            # 将标签的总数量存储到子字典中
-            res_dict[key]['total'] = value
-            # 计算标签的占比，并保留一位小数
-            proportion = round(value / total_cnt * 100, 1)
+            # # 为每个标签创建一个子字典
+            # res_dict[key] = {}
+            # # 将标签的总数量存储到子字典中
+            # res_dict[key]['total'] = value
+            # # 计算标签的占比，并保留一位小数
+            proportion = round(value / total_cnt * 100, 2)
             # 将占比存储到子字典中
-            res_dict[key]['proportion'] = rf'{proportion}%'
+            res_dict[key] = proportion
         # 返回标签及其对应的占比字典
         return res_dict
     
@@ -228,6 +231,6 @@ class DataAnalyzer:
                 #需要嵌入代码
                 data_line=DataPreprocess.text_clean(text=data_line,has_user_id=False,keep_segmentation=True)
 
-                if data_line is not None and len(data_line) >min_len:
+                if data_line is not None and len(data_line) >=min_len:
                     ret_list.append(data_line)
         return ret_list

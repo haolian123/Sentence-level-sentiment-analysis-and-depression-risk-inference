@@ -15,6 +15,11 @@ class Classification:
 
 
     def __init__(self,load_path="bert_model") :
+        #加载预训练模型Bert用于文本分类任务的Fine-tune网络BertForSequenceClassification, 它在BERT模型后接了一个全连接层进行分类。
+        #由于本任务中的情感分类是多分类问题，设定num_classes为7
+        self.__model = ppnlp.transformers.BertForSequenceClassification.from_pretrained("bert-base-chinese", num_classes=7)
+        #调用ppnlp.transformers.BertTokenizer进行数据处理，tokenizer可以把原始输入文本转化成模型model可接受的输入数据格式。
+        self.__tokenizer = ppnlp.transformers.BertTokenizer.from_pretrained("bert-base-chinese")
         #  加载：
         # load_path=model_path
         self.__load_path=load_path
@@ -83,8 +88,8 @@ class Classification:
         return results
     
     #对外接口
-    def getPredictResult(self,data):
-        predictions = self.__predict(self.__model, data, self.__tokenizer, self.__label_map, batch_size=32)
+    def get_predict_result(self,data):
+        predictions = self.__predict(self.__model, data, self.__tokenizer, self.__label_map, batch_size=1)
         return predictions
     
 
@@ -97,13 +102,13 @@ class Classification:
     # __label_list = ['0', '1', '2', '3', '4', '5', '6']
     __label_map ={'0': '快乐', '1': '恐惧', '2': '愤怒', '3': '惊讶', '4': '喜爱', '5': '厌恶', '6': '悲伤'}
 
-    #调用ppnlp.transformers.BertTokenizer进行数据处理，tokenizer可以把原始输入文本转化成模型model可接受的输入数据格式。
-    __tokenizer = ppnlp.transformers.BertTokenizer.from_pretrained("bert-base-chinese")
+    # #调用ppnlp.transformers.BertTokenizer进行数据处理，tokenizer可以把原始输入文本转化成模型model可接受的输入数据格式。
+    # __tokenizer = ppnlp.transformers.BertTokenizer.from_pretrained("bert-base-chinese")
  
     __load_path=''
-    #加载预训练模型Bert用于文本分类任务的Fine-tune网络BertForSequenceClassification, 它在BERT模型后接了一个全连接层进行分类。
-    #由于本任务中的情感分类是多分类问题，设定num_classes为7
-    __model = ppnlp.transformers.BertForSequenceClassification.from_pretrained("bert-base-chinese", num_classes=7)
+    # #加载预训练模型Bert用于文本分类任务的Fine-tune网络BertForSequenceClassification, 它在BERT模型后接了一个全连接层进行分类。
+    # #由于本任务中的情感分类是多分类问题，设定num_classes为7
+    # __model = ppnlp.transformers.BertForSequenceClassification.from_pretrained("bert-base-chinese", num_classes=7)
 
 
     
@@ -120,15 +125,3 @@ class Classification:
 
 
 
-# data=[]
-# # with open ("样例.txt",'r')as f:
-# #     for line in f:
-# #         line=line.strip("\n")
-# #         data.append(line)
-# # print(data)
-# data = ['如果情绪有天气，我困在阴天里','好想离开这个世界','讨厌下雨天','下雨天好烦','下雨天可以睡懒觉','怎样的我能让你更想念']
-# label_map ={'0': '快乐', '1': '害怕', '2': '生气', '3': '惊喜', '4': '喜爱', '5': '厌恶', '6': '难过'}
-
-# __predictions = __predict(model, data, tokenizer, label_map, batch_size=32)
-# for idx, text in enumerate(data):
-#     print('预测文本{}:{} \n预测情绪: {}\n'.format(idx+1,text, __predictions[idx]))
