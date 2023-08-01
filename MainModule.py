@@ -2,12 +2,20 @@
 from HaoChiUtils import DataAnalyzer as DA
 from MyModel import Classification
 import math
+import os
+import matplotlib.pyplot as plt                #导入绘图包
+from matplotlib import font_manager as fm
+from matplotlib import cm
+import numpy as np
+plt.rcParams['font.sans-serif'] = ['SimHei']   #解决中文显示问题
+plt.rcParams['axes.unicode_minus'] = False    # 解决中文显示问题
+
 #Depression risk inference
 class DRI:
     #结果1的阈值
-    __result1_threshold=59.89
+    __result1_threshold= 52.40
     # 熵率的阈值
-    __entropy_threshold=0.08014
+    __entropy_threshold=0.0801
 
     __label_list=['快乐','恐惧','愤怒','惊讶','喜爱','厌恶','悲伤']
     def __init__(self,model_path="bert_model"):
@@ -55,7 +63,7 @@ class DRI:
                 min_pi=pro_dict[i]
             if pro_dict[i]>max_pi and i !='惊讶':
                 max_pi=pro_dict[i]
-        if max_pi-min_pi>0.1:
+        if max_pi-min_pi>0.2:
             return True 
         return False
         
@@ -63,7 +71,7 @@ class DRI:
 
 
     #风险评估
-    def risk_assessment(self,user_path="",min_len=0):
+    def risk_assessment(self,user_path="",min_len=0,draw_pie=True):
         #待预测文本列表
         data_list=DA.get_dataList(user_path,min_len=min_len)
         #情绪占比
@@ -75,17 +83,85 @@ class DRI:
         #稳态
         emotional_homeostasis=self.get_emotional_homeostasis(pro_dict)
 
+        if draw_pie:
+            #画情绪占比饼图
+    
+            index1=user_path.rfind('\\')
+            index2=user_path.rfind('_')
+            user_name=user_path[index1:index2]
+            # print(user_name)
+            self.draw_pie(pro_dict=pro_dict,png_name=user_name)
+        score=0
+        #风险评估
+        if result1 < self.__result1_threshold:
+            return 0
+        elif emotional_homeostasis==False and entropy>=self.__entropy_threshold:
+            score=result1*1.2
+        elif emotional_homeostasis==True and entropy<self.__entropy_threshold:
+            score=result1*0.8
+        else:
+            score=result1
+        
+        risk_level=self.judge_rank(score)
+        # print("score=",score)
+        return risk_level
+
+    #分数转化为风险等级
+    def judge_rank(self,score):
+        score1=self.__result1_threshold
+        score2=59.5
+        score3=75.2
+        if score>score1 and score<score2:
+            return 1
+        elif score>=score2 and score<score3: 
+            return 2
+        elif score>=score3:
+            return 3
+        return 0
+    
+    def draw_pie(self,pro_dict,png_name,folder_path="情绪占比饼状图"):
+        labels = list(pro_dict.keys())
+        probs = list(pro_dict.values())
+
+        # 自定义颜色列表
+        # colors = ['skyblue', 'lightgreen', 'lightcoral', 'orange', 'pink', 'lightgrey', 'gold']
+        # colors = ['red', 'orange', 'yellow', 'violet', 'blue', 'indigo','green']
+        colors = ['#FF6347', '#FFD700', '#FFFF00', '#32CD32', '#B0E0E6', '#6495ED', '#9932CC']
+        # colors = cm.GnBu(np.arange(len(labels),0,-2) / len(labels))
+        # 自定义偏移量列表
+        explode = (0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
+        plt.figure(figsize=(10, 6.5),facecolor='lightgray')
+        # 设置标签字体属性
+        plt.pie(probs, labels=labels,pctdistance=0.8, autopct='%1.1f%%', colors=colors,textprops={'fontsize': 14,'fontfamily':'STXihei'},explode=explode)
+        plt.title('情绪占比',fontsize=20,fontfamily='KaiTi')
+
+        plt.legend(loc='lower right')
+        # 创建文件夹
+        os.makedirs(folder_path, exist_ok=True)
+
+        # 保存图像
+        save_path=folder_path+'\\'+png_name+'.png'
+        plt.savefig(save_path)
+        # plt.savefig("情绪占比饼状图\\"+png_name+'.png')
+
+
+
 if __name__=='__main__':
     dri=DRI()
-    data=DA.get_dataList("D:\学习资料\CCCCAI\SuspectedDepressedUsers\_壹然__20230407 20230721 .txt",min_len=2)
-    # pre=dri.myClassification.get_predict_result(data)
-    pro_dict=dri.get_pro_dict(data)
-    en=dri.get_entropy(pro_dict)
-    res1=dri.get_result1(pro_dict)
-    print(pro_dict)
-    print(en)
-    print("res1=",res1)
-    print(dri.get_emotional_homeostasis(pro_dict=pro_dict))
+    fir_list=os.listdir("SuspectedDepressedUsers")
+    res1s=[]
+    print('======================')
+    for i in fir_list:
+        user_path="SuspectedDepressedUsers\\"+i
+        # pre=dri.myClassification.get_predict_result(data)
+        # print("用户：",i)
+        # print("风险等级：",dri.risk_assessment(user_path=user_path,min_len=2))
+        dri.risk_assessment(user_path=user_path,min_len=2)
+        # break
+
+
+    
+    # print(res1s)
 
 
 
