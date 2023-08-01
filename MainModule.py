@@ -90,7 +90,7 @@ class DRI:
             index2=user_path.rfind('_')
             user_name=user_path[index1:index2]
             # print(user_name)
-            self.draw_pie(pro_dict=pro_dict,png_name=user_name)
+            self.__draw_pie(pro_dict=pro_dict,png_name=user_name)
         score=0
         #风险评估
         if result1 < self.__result1_threshold:
@@ -109,8 +109,8 @@ class DRI:
     #分数转化为风险等级
     def judge_rank(self,score):
         score1=self.__result1_threshold
-        score2=59.5
-        score3=75.2
+        score2=65.27
+        score3=78.13
         if score>score1 and score<score2:
             return 1
         elif score>=score2 and score<score3: 
@@ -119,7 +119,8 @@ class DRI:
             return 3
         return 0
     
-    def draw_pie(self,pro_dict,png_name,folder_path="情绪占比饼状图"):
+    #画饼状图
+    def __draw_pie(self,pro_dict,png_name,folder_path="情绪占比饼状图"):
         labels = list(pro_dict.keys())
         probs = list(pro_dict.values())
 
@@ -144,7 +145,30 @@ class DRI:
         plt.savefig(save_path)
         # plt.savefig("情绪占比饼状图\\"+png_name+'.png')
 
+    #画风险折线图
+    #输入的键值对为 月份：风险等级
+    def __plot_risk_rank(self,user_name,risk_month,folder_path="风险等级折线图"):
+        month_list=risk_month.keys()
+        risk_rank=risk_month.values()
+        plt.plot(month_list,risk_rank)
+        plt.title(f"用户“{user_name}”的风险折线图")
+        plt.xlabel("月份")
+        plt.ylabel("风险等级")
+        plt.savefig()
+        os.makedirs(folder_path, exist_ok=True)
+        # 保存图像
+        save_path=folder_path+'\\'+user_name+'.png'
+        plt.savefig(save_path)
 
+    # 给定按月划分的微博文本txt目录，目录以用户名命名，生成用户风险折线图。
+    # 文件路径：用户名/['202301.txt','202302.txt']
+    def get_risk_rank_plot(self,user_name,min_len=0):
+        risk_month={}
+        text_file_paths=os.listdir(user_name)
+        for text_file_path in text_file_paths:
+            risk_rank=self.risk_assessment(user_name+'\\'+f'{text_file_path}',draw_pie=False,min_len=min_len)
+            risk_month[text_file_path]=risk_rank
+        self.__plot_risk_rank(user_name=user_name,risk_month=risk_month,folder_path=f"风险等级折线图")
 
 if __name__=='__main__':
     dri=DRI()
