@@ -183,7 +183,7 @@ class DataAnalyzer:
         # plt.show()
 
 
-    # 计算标签占比，输入为预测结果的列表，输出为标签:占比
+    # 计算标签占比，输入为预测结果的列表，输出为标签:占比(0.xx)
     @classmethod
     def calculate_label_proportions(self,predictions,label_list):
         # 创建一个空字典用于存储标签及其对应的数量
@@ -211,7 +211,7 @@ class DataAnalyzer:
             # # 将标签的总数量存储到子字典中
             # res_dict[key]['total'] = value
             # # 计算标签的占比，并保留一位小数
-            proportion = round(value / total_cnt * 100, 2)
+            proportion = round(value / total_cnt , 2)
             # 将占比存储到子字典中
             res_dict[key] = proportion
         # 返回标签及其对应的占比字典
