@@ -83,9 +83,10 @@ class DRI:
 
 
     #风险评估
-    def risk_assessment(self,user_path="",min_len=1,draw_pie=True):
+    def risk_assessment(self,user_path="",min_len=1,draw_pie=True,min_text_num=5):
         #待预测文本列表
         data_list=DA.get_dataList(user_path,min_len=min_len)
+
         #情绪占比
         pro_dict=self.get_pro_dict(data_list)
         #熵率
@@ -109,8 +110,7 @@ class DRI:
         score=0
         print("result1=",result1)
         #风险评估
-        if result1 < self.__result1_threshold:
-            
+        if result1 < self.__result1_threshold or len(data_list)<min_text_num:
             return 0
         elif emotional_homeostasis==True and entropy>=self.__entropy_threshold:
             score=result1*1.2
@@ -146,7 +146,7 @@ class DRI:
         # colors = cm.GnBu(np.arange(len(labels),0,-2) / len(labels))
         # 自定义偏移量列表
         explode = (0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
-        plt.figure(figsize=(10, 7),facecolor='lightgray')
+        plt.figure(figsize=(10, 8),facecolor='lightgray')
         # 设置标签字体属性
         plt.pie(probs, labels=labels,pctdistance=0.8, autopct='%1.1f%%', colors=colors,textprops={'fontsize': 14,'fontfamily':'STXihei'},explode=explode)
         plt.title('情绪占比',fontsize=20,fontfamily='KaiTi')
@@ -165,15 +165,18 @@ class DRI:
     def __plot_risk_rank(self,user_name,risk_month,folder_path="风险等级折线图"):
         month_list=risk_month.keys()
         risk_rank=risk_month.values()
-        plt.figure(figsize=(10, 6.5),facecolor='lightgray')
+        plt.figure(figsize=(10, 10))
         plt.plot(month_list,risk_rank,marker='*')
+        plt.grid(True)
 
         
-
+        user_name_index=user_name.rfind('\\')
+        if user_name_index !=-1:
+            user_name=user_name[user_name_index+1:]
         plt.title(f"用户“{user_name}”的风险折线图",fontsize=20,fontfamily='KaiTi')
         plt.xlabel("月份")
-        plt.ylabel("风险等级")
-        plt.xticks(rotation=45)
+        plt.ylabel("风\n险\n等\n级",rotation=0,fontsize=15,fontfamily='KaiTi')
+        plt.xticks(rotation=270)
         plt.yticks([0,1,2,3])
         # plt.savefig()
         os.makedirs(folder_path, exist_ok=True)
@@ -189,7 +192,12 @@ class DRI:
         text_file_paths=os.listdir(user_name)
         for text_file_path in text_file_paths:
             risk_rank=self.risk_assessment(user_name+'\\'+f'{text_file_path}',draw_pie=False,min_len=min_len)
-            risk_month[text_file_path]=risk_rank
+            index1=text_file_path.find('_')
+            if index1 <0:
+                index1=0
+            index2=text_file_path.rfind('.')
+            _month=text_file_path[index1+1:index2]
+            risk_month[_month]=risk_rank
         self.__plot_risk_rank(user_name=user_name,risk_month=risk_month,folder_path=f"风险等级折线图")
 
 
