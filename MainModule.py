@@ -13,11 +13,20 @@ plt.rcParams['axes.unicode_minus'] = False    # 解决中文显示问题
 #Depression risk inference
 class DRI:
     #结果1的阈值
-    __result1_threshold= 52.40
+    __result1_threshold= 57.75
     # 熵率的阈值
-    __entropy_threshold=0.0801
+    __entropy_threshold=0.0752
 
+
+    __score1=__result1_threshold
+    __score2=__score1+(130*0.7-__score1)/3
+    __score3=__score2+(130*0.7-__score2)/3
+
+    
+    #情绪标签
     __label_list=['快乐','恐惧','愤怒','惊讶','喜爱','厌恶','悲伤']
+
+    
     def __init__(self,model_path="bert_model"):
         #加载模型
         self.myClassification=Classification(model_path)
@@ -53,25 +62,28 @@ class DRI:
         return pro_dict
     
     #得到情绪稳态
-    # 情绪稳态：找pi最低的情绪，看有没有大它10%以上的情绪存在，
+    # 情绪稳态：找pi最低的情绪，看有没有大它20%以上的情绪存在，
     # 有，情绪稳态=true，无，情绪稳态=false
-    def get_emotional_homeostasis(self,pro_dict):
+    def get_emotional_homeostasis(self,pro_dict,threshold=0.2):
         min_pi=1
         max_pi=0
         for i in self.__label_list:
-            if pro_dict[i]<min_pi and i !='惊讶':
+            if pro_dict[i]<min_pi and i !='惊讶' and pro_dict[i]>0:
                 min_pi=pro_dict[i]
-            if pro_dict[i]>max_pi and i !='惊讶':
+            if pro_dict[i]>max_pi and i !='惊讶' and pro_dict[i]>0:
                 max_pi=pro_dict[i]
-        if max_pi-min_pi>0.2:
+        if max_pi-min_pi>threshold:
             return True 
         return False
+        # if max_pi-min_pi>threshold:
+        #     return True 
+        # return False
         
     # def judge_rank(self,score):
 
 
     #风险评估
-    def risk_assessment(self,user_path="",min_len=0,draw_pie=True):
+    def risk_assessment(self,user_path="",min_len=1,draw_pie=True):
         #待预测文本列表
         data_list=DA.get_dataList(user_path,min_len=min_len)
         #情绪占比
@@ -82,40 +94,43 @@ class DRI:
         result1=self.get_result1(pro_dict)
         #稳态
         emotional_homeostasis=self.get_emotional_homeostasis(pro_dict)
-
+        print(pro_dict)
         if draw_pie:
             #画情绪占比饼图
     
             index1=user_path.rfind('\\')
             index2=user_path.rfind('_')
-            user_name=user_path[index1:index2]
+            user_name=user_path
+            if index1>=0 and index2 >=0:
+                user_name=user_path[index1:index2]
+            
             # print(user_name)
             self.__draw_pie(pro_dict=pro_dict,png_name=user_name)
         score=0
+        print("result1=",result1)
         #风险评估
         if result1 < self.__result1_threshold:
+            
             return 0
-        elif emotional_homeostasis==False and entropy>=self.__entropy_threshold:
+        elif emotional_homeostasis==True and entropy>=self.__entropy_threshold:
             score=result1*1.2
-        elif emotional_homeostasis==True and entropy<self.__entropy_threshold:
+        elif emotional_homeostasis==False and entropy<self.__entropy_threshold:
             score=result1*0.8
         else:
             score=result1
         
         risk_level=self.judge_rank(score)
-        # print("score=",score)
+        print("分数=",score)
         return risk_level
 
     #分数转化为风险等级
     def judge_rank(self,score):
-        score1=self.__result1_threshold
-        score2=65.27
-        score3=78.13
-        if score>score1 and score<score2:
+        
+        if score>self.__score1 and score<self.__score2:
             return 1
-        elif score>=score2 and score<score3: 
+        elif score>=self.__score2 and score<self.__score3: 
             return 2
-        elif score>=score3:
+        elif score>=self.__score3:
             return 3
         return 0
     
@@ -131,7 +146,7 @@ class DRI:
         # colors = cm.GnBu(np.arange(len(labels),0,-2) / len(labels))
         # 自定义偏移量列表
         explode = (0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
-        plt.figure(figsize=(10, 6.5),facecolor='lightgray')
+        plt.figure(figsize=(10, 7),facecolor='lightgray')
         # 设置标签字体属性
         plt.pie(probs, labels=labels,pctdistance=0.8, autopct='%1.1f%%', colors=colors,textprops={'fontsize': 14,'fontfamily':'STXihei'},explode=explode)
         plt.title('情绪占比',fontsize=20,fontfamily='KaiTi')
@@ -150,14 +165,21 @@ class DRI:
     def __plot_risk_rank(self,user_name,risk_month,folder_path="风险等级折线图"):
         month_list=risk_month.keys()
         risk_rank=risk_month.values()
-        plt.plot(month_list,risk_rank)
-        plt.title(f"用户“{user_name}”的风险折线图")
+        plt.figure(figsize=(10, 6.5),facecolor='lightgray')
+        plt.plot(month_list,risk_rank,marker='*')
+
+        
+
+        plt.title(f"用户“{user_name}”的风险折线图",fontsize=20,fontfamily='KaiTi')
         plt.xlabel("月份")
         plt.ylabel("风险等级")
-        plt.savefig()
+        plt.xticks(rotation=45)
+        plt.yticks([0,1,2,3])
+        # plt.savefig()
         os.makedirs(folder_path, exist_ok=True)
         # 保存图像
         save_path=folder_path+'\\'+user_name+'.png'
+        # print(save_path)
         plt.savefig(save_path)
 
     # 给定按月划分的微博文本txt目录，目录以用户名命名，生成用户风险折线图。
@@ -170,27 +192,4 @@ class DRI:
             risk_month[text_file_path]=risk_rank
         self.__plot_risk_rank(user_name=user_name,risk_month=risk_month,folder_path=f"风险等级折线图")
 
-if __name__=='__main__':
-    dri=DRI()
-    fir_list=os.listdir("SuspectedDepressedUsers")
-    res1s=[]
-    print('======================')
-    for i in fir_list:
-        user_path="SuspectedDepressedUsers\\"+i
-        # pre=dri.myClassification.get_predict_result(data)
-        # print("用户：",i)
-        # print("风险等级：",dri.risk_assessment(user_path=user_path,min_len=2))
-        dri.risk_assessment(user_path=user_path,min_len=2)
-        # break
 
-
-    
-    # print(res1s)
-
-
-
-
-    # with open("zoufan.txt",'w') as f:
-    #     for i in range(len(data)):
-    #         strs=f'{data[i]}'+'\n'+f'{pre[i]}'+'\n'
-    #         f.write(strs)
