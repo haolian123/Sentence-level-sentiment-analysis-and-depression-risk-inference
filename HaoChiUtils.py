@@ -62,6 +62,10 @@ class DataPreprocess:
         
         # 去除表情符号
         text = re.sub(r"\[\S+?\]", "", text)
+
+        #去除中文标点
+        # 使用re.sub()函数将标点符号替换为空格
+        text = re.sub(r'[^\w\s]', ' ', text)
         
         # 去除话题标签
         text = re.sub(r"#\S+#", "", text)

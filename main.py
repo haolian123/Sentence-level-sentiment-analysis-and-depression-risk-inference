@@ -3,6 +3,7 @@ from HaoChiUtils import DataAnalyzer as DA
 from MainModule import DRI 
 import os
 if __name__=='__main__':
+    dri=DRI()
     # # label_list=['快乐','恐惧','愤怒','惊讶','喜爱','厌恶','悲伤']
     # #初始化模型
     # myClassification=Classification("bert_model")
@@ -19,7 +20,7 @@ if __name__=='__main__':
 
 
     # #得到风险等级
-    dri=DRI()
+    # dri=DRI()
     # fir_list=os.listdir("SuspectedDepressedUsers")
     # res1s=[]
     # print('======================')
@@ -45,15 +46,34 @@ if __name__=='__main__':
 
 
 
-    #画风险等级折线图
-    dri=DRI()
+    #============================画风险等级折线图==============================
+    # dri=DRI()
 
-    file_name="正常用户" #文件夹名字
-    users=os.listdir(file_name)# 获取文件列表
-    for i in users:
-        #画风险等级折线图
-        dri.get_risk_rank_plot("正常用户\\"+i,min_len=6)
+    # file_name="正常用户" #文件夹名字
+    # users=os.listdir(file_name)# 获取文件列表
+    # for i in users:
+    #     #画风险等级折线图
+    #     dri.get_risk_rank_plot("正常用户\\"+i,min_len=6)
+
+    # dri.get_risk_rank_plot("走饭",min_len=6)
+
+    # #===========================得到文本的预测情绪===============================
+    # pre_text=DA.get_dataList("D:\学习资料\CCCCAI\走饭\走饭_2012-02.txt",min_len=6)
+    # pre=dri.myClassification.get_predict_result(pre_text)
+    # for i in range(len(pre_text)):
+    #     print(pre_text[i])
+    #     print(pre[i])
 
 
-
+    #test
+    text_list=os.listdir("走饭")
+    for i in text_list:
+        path="走饭\\"+i
+        min_len=6
+        pre_text=DA.get_dataList(path,min_len)
+        pre=dri.myClassification.get_predict_result(pre_text)
+        with open (path,'w') as f:
+            for j in range(len(pre_text)):
+                f.write(pre_text[j]+'\n'+pre[j]+'\n')
+            
 

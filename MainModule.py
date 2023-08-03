@@ -17,7 +17,7 @@ class DRI:
     # 熵率的阈值
     __entropy_threshold=0.0752
 
-
+    #指标
     __score1=__result1_threshold
     __score2=__score1+(130*0.7-__score1)/3
     __score3=__score2+(130*0.7-__score2)/3
@@ -33,47 +33,66 @@ class DRI:
 
     #计算结果1
     #传入标签占比，保留2位小数
-    def get_result1(self,pro_dict):
-        # label_list=['快乐','恐惧','愤怒','惊讶','喜爱','厌恶','悲伤']
-        weight_list=[-1,0.5,1,0,-1.5,0.5,1.3]
-        result=0
+    def get_result1(self, pro_dict):
+        # 定义权重列表
+        weight_list = [-1, 0.5, 1, 0, -1.5, 0.5, 1.3]
+        # 初始化结果
+        result = 0
+        # 遍历标签列表
         for i in range(len(self.__label_list)):
-            result+=pro_dict[self.__label_list[i]]*weight_list[i]*100
-        return round(result,2)
+            # 计算结果
+            result += pro_dict[self.__label_list[i]] * weight_list[i] * 100
+        # 返回结果并保留两位小数
+        return round(result, 2)
     
 
     #计算熵率
     #传入标签占比,保留5位小数
-    def get_entropy(self,pro_dict,time_interval=20):
-        # label_list=['快乐','恐惧','愤怒','惊讶','喜爱','厌恶','悲伤']
-        total_pi=0
+    def get_entropy(self, pro_dict, time_interval=20):
+        # 初始化总概率
+        total_pi = 0
+        # 遍历标签列表
         for i in range(len(self.__label_list)):
-            pi=pro_dict[self.__label_list[i]]
-            # print(pi)
-            if pi >0:
-                total_pi+=-pi*math.log2(pi)
-        return round(total_pi/time_interval,5)
+            # 获取标签对应的概率
+            pi = pro_dict[self.__label_list[i]]
+            # 如果概率大于0
+            if pi > 0:
+                # 计算熵
+                total_pi += -pi * math.log2(pi)
+        # 返回平均熵并保留五位小数
+        return round(total_pi / time_interval, 5)
 
     #得到占比标签
     #data 为待预测的数据
-    def get_pro_dict(self,data):
-        pre_list=self.myClassification.get_predict_result(data)
-        pro_dict=DA.calculate_label_proportions(pre_list,label_list=self.__label_list)
+    def get_pro_dict(self, data):
+        # 获取预测结果列表
+        pre_list = self.myClassification.get_predict_result(data)
+        # 计算标签比例字典
+        pro_dict = DA.calculate_label_proportions(pre_list, label_list=self.__label_list)
+        # 返回标签比例字典
         return pro_dict
     
-    #得到情绪稳态
-    # 情绪稳态：找pi最低的情绪，看有没有大它20%以上的情绪存在，
-    # 有，情绪稳态=true，无，情绪稳态=false
-    def get_emotional_homeostasis(self,pro_dict,threshold=0.2):
-        min_pi=1
-        max_pi=0
+    # 得到情绪稳态
+    # 情绪稳态：找占比最低的情绪，看有没有大于它20%以上的情绪存在，
+    # 有，情绪稳态=True，无，情绪稳态=False
+    def get_emotional_homeostasis(self, pro_dict, threshold=0.2):
+        # 初始化最小占比和最大占比
+        min_proportion = 1
+        max_proportion = 0
+        # 遍历标签列表
         for i in self.__label_list:
-            if pro_dict[i]<min_pi and i !='惊讶' and pro_dict[i]>0:
-                min_pi=pro_dict[i]
-            if pro_dict[i]>max_pi and i !='惊讶' and pro_dict[i]>0:
-                max_pi=pro_dict[i]
-        if max_pi-min_pi>threshold:
-            return True 
+            # 如果占比小于最小占比且不是'惊讶'标签且占比大于0
+            if pro_dict[i] < min_proportion and i != '惊讶' and pro_dict[i] > 0:
+                # 更新最小占比
+                min_proportion = pro_dict[i]
+            # 如果占比大于最大占比且不是'惊讶'标签且占比大于0
+            if pro_dict[i] > max_proportion and i != '惊讶' and pro_dict[i] > 0:
+                # 更新最大占比
+                max_proportion = pro_dict[i]
+        # 如果最大占比与最小占比之差大于阈值
+        if max_proportion - min_proportion > threshold:
+            return True
+        # 情绪稳态False
         return False
         # if max_pi-min_pi>threshold:
         #     return True 
@@ -107,18 +126,23 @@ class DRI:
             
             # print(user_name)
             self.__draw_pie(pro_dict=pro_dict,png_name=user_name)
+
         score=0
         print("result1=",result1)
         #风险评估
         if result1 < self.__result1_threshold or len(data_list)<min_text_num:
             return 0
+        
         elif emotional_homeostasis==True and entropy>=self.__entropy_threshold:
             score=result1*1.2
+
         elif emotional_homeostasis==False and entropy<self.__entropy_threshold:
             score=result1*0.8
+            
         else:
             score=result1
-        
+
+        # 判断风险等级
         risk_level=self.judge_rank(score)
         print("分数=",score)
         return risk_level
@@ -190,14 +214,18 @@ class DRI:
     def get_risk_rank_plot(self,user_name,min_len=0):
         risk_month={}
         text_file_paths=os.listdir(user_name)
+        # 分别对每个月的文本进行风险评估
         for text_file_path in text_file_paths:
+             # 进行风险评估
             risk_rank=self.risk_assessment(user_name+'\\'+f'{text_file_path}',draw_pie=False,min_len=min_len)
             index1=text_file_path.find('_')
             if index1 <0:
                 index1=0
             index2=text_file_path.rfind('.')
+            #得到月份
             _month=text_file_path[index1+1:index2]
             risk_month[_month]=risk_rank
+        #画风险折线图
         self.__plot_risk_rank(user_name=user_name,risk_month=risk_month,folder_path=f"风险等级折线图")
 
 
