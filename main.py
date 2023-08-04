@@ -2,78 +2,56 @@ from MyModel import Classification
 from HaoChiUtils import DataAnalyzer as DA
 from MainModule import DRI 
 import os
+from FunctionalInterface import TextEmotionAnalyzer as TEA
+
 if __name__=='__main__':
-    dri=DRI()
-    # # label_list=['快乐','恐惧','愤怒','惊讶','喜爱','厌恶','悲伤']
-    # #初始化模型
-    # myClassification=Classification("bert_model")
-    # #读取文本
-    # data = DA.get_dataList("cache\hhfxvbhxtjcckf_20230131 20230629 .txt")
-    # #预测
-    # pre=myClassification.get_predict_result(data)
-    # #打印预测结果
-    # print(pre)
-    # with open("模型示例.txt",'w') as f:
-    #     for i in range(len(data)):
-    #         st=f"文本：{data[i]}"+'\n'+f'预测情绪：{pre[i]}\n'
-    #         f.write(st)
+
+    tea=TEA()
 
 
-    # #得到风险等级
-    # dri=DRI()
-    # fir_list=os.listdir("SuspectedDepressedUsers")
-    # res1s=[]
-    # print('======================')
-    # for i in fir_list:
-    #     user_path="SuspectedDepressedUsers\\"+i
-    #     # pre=dri.myClassification.get_predict_result(data)
-    #     print("用户：",i)
-        
-    #     print("风险等级：",dri.risk_assessment(user_path=user_path,min_len=6,draw_pie=False))
-    #     # dri.risk_assessment(user_path=user_path,min_len=2,draw_pie=False)
-    #     # break
+    ## ===============传入一个用户的txt文本，将情绪预测结果和情绪占比写入txt文本=======
+    # src_path="D:\学习资料\CCCCAI\SuspectedDepressedUsers\hhfxvbhxtjcckf_20230131 20230629 .txt"
+    # dest_path="D:\学习资料\CCCCAI\输出文件夹"
+    # tea.sentiment_proportion(src_path,dest_path)
 
 
-    # #预测情绪
-    # # print(res1s)
-    # data=DA.get_dataList("D:\学习资料\CCCCAI\正常用户\峰哥亡命天涯\峰哥亡命天涯_2023-03.txt",min_len=6)
-    # pre=dri.myClassification.get_predict_result(data)
-    # with open("老逼灯.txt",'w') as f:
-    #     for i in range(len(data)):
-    #         strs=f'{data[i]}'+'\n'+f'{pre[i]}'+'\n'
-    #         f.write(strs)
+    # # ==============传入一个用户的txt文本，得到情绪占比饼状图===============
+    # src_path="低级普男_2023-06.txt"
+    # tea.sentiment_ratio_pie(src_path)
+
+    # # =================传入一个用户的txt文本，得到预测的风险等级==============
+    # src_path="D:\学习资料\CCCCAI\SuspectedDepressedUsers\hhfxvbhxtjcckf_20230131 20230629 .txt"
+    # rank=tea.risk_rank(src_path)
+    # print(rank)
+
+    # ===========传入一个用户的txt文本文件夹，得到用户的风险等级列表==========
+    src_path="D:\学习资料\CCCCAI\疑似用户\shsjxhdjxjd"
+    rank=tea.risk_rank_list(src_path)
+    print(rank)
 
 
 
-
-    #============================画风险等级折线图==============================
-    # dri=DRI()
-
-    # file_name="正常用户" #文件夹名字
-    # users=os.listdir(file_name)# 获取文件列表
-    # for i in users:
-    #     #画风险等级折线图
-    #     dri.get_risk_rank_plot("正常用户\\"+i,min_len=6)
-
-    # dri.get_risk_rank_plot("走饭",min_len=6)
-
-    # #===========================得到文本的预测情绪===============================
-    # pre_text=DA.get_dataList("D:\学习资料\CCCCAI\走饭\走饭_2012-02.txt",min_len=6)
-    # pre=dri.myClassification.get_predict_result(pre_text)
-    # for i in range(len(pre_text)):
-    #     print(pre_text[i])
-    #     print(pre[i])
+    # =========传入一个用户的txt文本文件夹，得到用户的风险等级折线图===========
+    src_path='D:\学习资料\CCCCAI\正常用户\便利店在逃关東煮·o·'
+    tea.risk_rank_plot(src_folder_path=src_path)
 
 
-    #test
-    text_list=os.listdir("走饭")
-    for i in text_list:
-        path="走饭\\"+i
-        min_len=6
-        pre_text=DA.get_dataList(path,min_len)
-        pre=dri.myClassification.get_predict_result(pre_text)
-        with open (path,'w') as f:
-            for j in range(len(pre_text)):
-                f.write(pre_text[j]+'\n'+pre[j]+'\n')
-            
+    # ======传入一个用户的txt文本文件夹，将情绪预测结果和情绪占比写入一个文件夹中=========
+    src_path='D:\学习资料\CCCCAI\正常用户\便利店在逃关東煮·o·'
+    tea.batch_sentiment_proportion(src_path)
+
+    # ==========传入一个包含多个用户文本文件夹的文件夹，得到所有用户的风险等级折线图=======
+    src_path='D:\学习资料\CCCCAI\正常用户'
+    tea.batch_risk_rank_plot(src_path,dest_folder_path='batch风险等级折线图')
+
+    # ============传入一个包含多个用户文本的文件夹，得到所有用户的情绪占比饼状图=========
+    src_path='D:\学习资料\CCCCAI\正常用户\便利店在逃关東煮·o·'
+    tea.batch_sentiment_ratio_pie(src_folder_path=src_path)
+
+    
+
+
+
+
+    
 

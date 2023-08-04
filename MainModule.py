@@ -24,7 +24,7 @@ class DRI:
 
     
     #情绪标签
-    __label_list=['快乐','恐惧','愤怒','惊讶','喜爱','厌恶','悲伤']
+    label_list=['快乐','恐惧','愤怒','惊讶','喜爱','厌恶','悲伤']
 
     
     def __init__(self,model_path="bert_model"):
@@ -39,9 +39,9 @@ class DRI:
         # 初始化结果
         result = 0
         # 遍历标签列表
-        for i in range(len(self.__label_list)):
+        for i in range(len(self.label_list)):
             # 计算结果
-            result += pro_dict[self.__label_list[i]] * weight_list[i] * 100
+            result += pro_dict[self.label_list[i]] * weight_list[i] * 100
         # 返回结果并保留两位小数
         return round(result, 2)
     
@@ -52,9 +52,9 @@ class DRI:
         # 初始化总概率
         total_pi = 0
         # 遍历标签列表
-        for i in range(len(self.__label_list)):
+        for i in range(len(self.label_list)):
             # 获取标签对应的概率
-            pi = pro_dict[self.__label_list[i]]
+            pi = pro_dict[self.label_list[i]]
             # 如果概率大于0
             if pi > 0:
                 # 计算熵
@@ -68,7 +68,7 @@ class DRI:
         # 获取预测结果列表
         pre_list = self.myClassification.get_predict_result(data)
         # 计算标签比例字典
-        pro_dict = DA.calculate_label_proportions(pre_list, label_list=self.__label_list)
+        pro_dict = DA.calculate_label_proportions(pre_list, label_list=self.label_list)
         # 返回标签比例字典
         return pro_dict
     
@@ -80,7 +80,7 @@ class DRI:
         min_proportion = 1
         max_proportion = 0
         # 遍历标签列表
-        for i in self.__label_list:
+        for i in self.label_list:
             # 如果占比小于最小占比且不是'惊讶'标签且占比大于0
             if pro_dict[i] < min_proportion and i != '惊讶' and pro_dict[i] > 0:
                 # 更新最小占比
@@ -102,7 +102,7 @@ class DRI:
 
 
     #风险评估
-    def risk_assessment(self,user_path="",min_len=1,draw_pie=True,min_text_num=5):
+    def risk_assessment(self,user_path="",min_len=1,min_text_num=5):
         #待预测文本列表
         data_list=DA.get_dataList(user_path,min_len=min_len)
 
@@ -114,21 +114,10 @@ class DRI:
         result1=self.get_result1(pro_dict)
         #稳态
         emotional_homeostasis=self.get_emotional_homeostasis(pro_dict)
-        print(pro_dict)
-        if draw_pie:
-            #画情绪占比饼图
-    
-            index1=user_path.rfind('\\')
-            index2=user_path.rfind('_')
-            user_name=user_path
-            if index1>=0 and index2 >=0:
-                user_name=user_path[index1:index2]
-            
-            # print(user_name)
-            self.__draw_pie(pro_dict=pro_dict,png_name=user_name)
+
 
         score=0
-        print("result1=",result1)
+        # print("result1=",result1)
         #风险评估
         if result1 < self.__result1_threshold or len(data_list)<min_text_num:
             return 0
@@ -144,7 +133,7 @@ class DRI:
 
         # 判断风险等级
         risk_level=self.judge_rank(score)
-        print("分数=",score)
+        # print("分数=",score)
         return risk_level
 
     #分数转化为风险等级
@@ -159,7 +148,7 @@ class DRI:
         return 0
     
     #画饼状图
-    def __draw_pie(self,pro_dict,png_name,folder_path="情绪占比饼状图"):
+    def draw_pie(self,pro_dict,dest_path):
         labels = list(pro_dict.keys())
         probs = list(pro_dict.values())
 
@@ -177,10 +166,10 @@ class DRI:
 
         plt.legend(loc='lower right')
         # 创建文件夹
-        os.makedirs(folder_path, exist_ok=True)
+        # os.makedirs(folder_path, exist_ok=True)
 
         # 保存图像
-        save_path=folder_path+'\\'+png_name+'.png'
+        save_path=dest_path
         plt.savefig(save_path)
         # plt.savefig("情绪占比饼状图\\"+png_name+'.png')
 
@@ -211,13 +200,21 @@ class DRI:
 
     # 给定按月划分的微博文本txt目录，目录以用户名命名，生成用户风险折线图。
     # 文件路径：用户名/['202301.txt','202302.txt']
-    def get_risk_rank_plot(self,user_name,min_len=0):
+    def get_risk_rank_plot(self,src_path,min_len=1,dest_folder_path='风险等级折线图'):
         risk_month={}
-        text_file_paths=os.listdir(user_name)
+        #提取用户名
+        index1=src_path.rfind('\\')
+        index1=max(index1,-1)
+        # print('index1=',index1)
+        # print('index2=',index2)
+        user_name=src_path[index1+1:]
+        text_file_paths=os.listdir(src_path)
+        #按时间升序排序
+        text_file_paths=sorted(text_file_paths)
         # 分别对每个月的文本进行风险评估
         for text_file_path in text_file_paths:
              # 进行风险评估
-            risk_rank=self.risk_assessment(user_name+'\\'+f'{text_file_path}',draw_pie=False,min_len=min_len)
+            risk_rank=self.risk_assessment(src_path+'\\'+f'{text_file_path}',min_len=min_len)
             index1=text_file_path.find('_')
             if index1 <0:
                 index1=0
@@ -226,6 +223,6 @@ class DRI:
             _month=text_file_path[index1+1:index2]
             risk_month[_month]=risk_rank
         #画风险折线图
-        self.__plot_risk_rank(user_name=user_name,risk_month=risk_month,folder_path=f"风险等级折线图")
+        self.__plot_risk_rank(user_name=user_name,risk_month=risk_month,folder_path=dest_folder_path)
 
 

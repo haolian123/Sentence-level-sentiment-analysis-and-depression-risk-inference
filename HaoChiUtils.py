@@ -226,7 +226,7 @@ class DataAnalyzer:
     #data_file_path:    文件路径
     #min_len:           文本的最小长度
     @classmethod
-    def get_dataList(self,data_file_path,min_len=0):
+    def get_dataList(self,data_file_path,min_len=1):
         ret_list=[]
         with open(data_file_path,'r',encoding='utf-8') as f:
             for data_line in f:

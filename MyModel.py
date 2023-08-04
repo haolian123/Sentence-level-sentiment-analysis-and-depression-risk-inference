@@ -7,7 +7,9 @@ from paddlenlp.data import Stack, Pad, Tuple
 import paddle.nn.functional as F
 import numpy as np
 from functools import partial #partial()函数可以用来固定某些参数值，并返回一个新的callable对象
+import logging
 
+logging.disable(logging.CRITICAL)
 
 class Classification:
     
