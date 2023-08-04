@@ -92,12 +92,18 @@
     ```
     if len(month_id) > len(text):
             month_id = month_id[::-1][1:]
+<<<<<<< HEAD
     ```
+=======
+>>>>>>> 7b6c6a9b3c6cffd5bc8468cccd09490cbb7ee1da
   + 补全信息机制：末尾使用
     ```
     if len(per_month) != 0:
             li.append(per_month)
+<<<<<<< HEAD
     ```
+=======
+>>>>>>> 7b6c6a9b3c6cffd5bc8468cccd09490cbb7ee1da
 + 数据输出：
   + 数据1：发言文本数据（按先后顺序）`list`类型
   + 数据2：记录年月列表，`list`类型
