@@ -216,7 +216,7 @@
   从`__load_path`加载模型进入
 
 ##### 2. `__convert_example(self,example,tokenizer,label_list,max_seq_length=256,is_test=False)`说明：
-+ `example`
+###### 主要参数
 
 ## 工具类代码
 
