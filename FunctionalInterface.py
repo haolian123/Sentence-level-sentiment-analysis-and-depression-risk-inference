@@ -76,6 +76,15 @@ class TextEmotionAnalyzer:
             res_rank_list.append(rank)
         return res_rank_list
 
+
+    #传入一个用户的txt文本，得到用户的情绪占比 key:values
+    def  emotions_proportion(self,src_path,min_len=1):
+         #读取文本
+        data=DA.get_dataList(src_path,min_len=min_len)
+        pro_dict=self.dri.get_pro_dict(data)
+        return pro_dict
+    
+    
     #传入一个用户的txt文本文件夹，将情绪预测结果和情绪占比写入一个文件夹中
     def batch_sentiment_proportion(self,src_folder_path,dest_folder_path="情绪预测结果",min_len=1):
         text_list=os.listdir(src_folder_path)
@@ -105,5 +114,5 @@ class TextEmotionAnalyzer:
         user_text=os.listdir(src_folder_path)
         for user in user_text:
             src_path=f'{src_folder_path}\\{user}'
-            self.sentiment_ratio_pie(src_path=src_path)
+            self.sentiment_ratio_pie(src_path=src_path,folder_path=dest_folder_path)
 

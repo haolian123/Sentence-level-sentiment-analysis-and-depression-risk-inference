@@ -16,6 +16,10 @@ class DRI:
     __result1_threshold= 57.75
     # 熵率的阈值
     __entropy_threshold=0.0752
+    #悲伤情绪占比阈值
+    __sadness_proportion_threshold=0.65
+    #情绪变化阈值
+    __mood_change_threshold=0.333
 
     #指标
     __score1=__result1_threshold
@@ -103,6 +107,8 @@ class DRI:
 
     #风险评估
     def risk_assessment(self,user_path="",min_len=1,min_text_num=5):
+
+
         #待预测文本列表
         data_list=DA.get_dataList(user_path,min_len=min_len)
 
@@ -114,12 +120,20 @@ class DRI:
         result1=self.get_result1(pro_dict)
         #稳态
         emotional_homeostasis=self.get_emotional_homeostasis(pro_dict)
+        #标准差
+        S=self.get_standard_deviation(pro_dict=pro_dict)
 
+        if pro_dict['悲伤']<=self.__sadness_proportion_threshold:
+            if S<self.__mood_change_threshold:
+                result1*=0.9
+            else:
+                result1*=1.1
 
         score=0
         # print("result1=",result1)
         #风险评估
         if result1 < self.__result1_threshold or len(data_list)<min_text_num:
+            # print("小于result1阈值，分数=",result1)
             return 0
         
         elif emotional_homeostasis==True and entropy>=self.__entropy_threshold:
@@ -134,6 +148,8 @@ class DRI:
         # 判断风险等级
         risk_level=self.judge_rank(score)
         # print("分数=",score)
+        # print("score2=",self.__score2)
+        # print("score3=",self.__score3)
         return risk_level
 
     #分数转化为风险等级
@@ -225,4 +241,31 @@ class DRI:
         #画风险折线图
         self.__plot_risk_rank(user_name=user_name,risk_month=risk_month,folder_path=dest_folder_path)
 
-
+    #计算得到情绪占比标准差
+    #计算情绪变化阈值
+    def __maxmin(self,pro_list):
+        Max=0
+        Min=1
+        for i in pro_list:
+            if i >0 and i<Min:
+                Min=i
+            if i>Max:
+                Max=i 
+        return Max,Min
+    #归一化,传入一个字典
+    def get_standard_deviation(self,pro_dict):
+        # pro_keys=pro_dict.keys()
+        pro_values=pro_dict.values()
+        pro_max,pro_min=self.__maxmin(pro_values)
+        div=pro_max-pro_min
+        if div==0:
+            div=1
+        pro_values=[max((x-pro_min)/div,0) for x in pro_values]
+        mean_u=sum(pro_values)/len(pro_values)
+        S_square=0
+        x_sum=0
+        for x in pro_values:
+            x_sum+=(x-mean_u)*(x-mean_u)
+        S_square=x_sum/len(pro_values)
+        S=round(math.sqrt(S_square),2)
+        return S
