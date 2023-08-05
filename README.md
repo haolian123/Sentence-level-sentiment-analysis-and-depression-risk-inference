@@ -216,7 +216,34 @@
   从`__load_path`加载模型进入
 
 ##### 2. `__convert_example(self,example,tokenizer,label_list,max_seq_length=256,is_test=False)`说明：
-###### 主要参数
+###### 参数
++ `example`：作为键值对存在存在两个键`text`和`label`的，而`is_test`使得`text=example`的意义为在测试中`example`就是文本
+
++ `encoded_inputs`：使用`tokenizer.encode`对`text`进行切分处理，得到键值对。在`is_test=True`情况下输出键值对仅有`input_ids`和`segment_ids`，不包括`label`（情感标签）
+
+###### 主要功能
++ 将`example`中的键值对限制`max_seq_length`最大长度，切片完成后得到`encoded_inputs`，之后可以得到`label`、`input_ids`和`segment_ids`，并返回对应数据列表
+
+##### 3. `__predict(self,model, data, tokenizer, label_map, batch_size=1)`说明：
+###### 参数
++ `example`：将`(input_ids,segment_ids)`放入`list`类型的`example`
++ ·batchify_fn：由生成的元组`Pad`函数，并且将samples输入`lamda`的函数，`Pad`是一个张量转化函数
++ `one_batch`：充当将`examples`中的元组对放入列表的中转容器
++ `batches`：`batches`录入长度低于`batch_size`的`one_batch`的列表容器
++ `results`：模型预测各个标签的结果列表
+
+###### 主要功能
++ 将`data`转换为可供模型处理的`batchers`键值对，将模型设置为评估模式，通过`model.eval() `实现
+
++ 将输入数据传入模型进行判断，得到输出的`logits`，之后利用`softmax()`函数进行概率归一化，得到类别概率分布
+
++ 使用`paddle.argmax()`函数找到最大概率对应的类别索引值，将其转换为`numpy`的数组形式，并转换为`Python`的列表形式`idx.tolist()`
+
++ 将对应的标签拓展至`results`中
+
+##### 4. `predictions = self.__predict(self.__model, data, self.__tokenizer, self.__label_map, batch_size=1)`说明：
++ 功能：
+  将`data`进行重处理，返回`predictions`结果（上述的`results`）
 
 ## 工具类代码
 
