@@ -196,3 +196,50 @@
 
 + 输出：
   `ret_list`的`list`数据，作为外部接口关联
+
+## 模型代码
+
+### MyModel.py
+
+#### 一、主要参数：
+
+#### 二、相关函数说明：
+
+##### 1. `__init__(self,load_path="bert_model") `函数说明：
++ `self.__model = ppnlp.transformers.BertForSequenceClassification.from_pretrained("bert-base-chinese", num_classes=7)`：
+  从`ppnlp`引入模型（飞桨的`nlp`）为文本转化为序列分类模型，`num_classes=7`将分类种类定为7
+
++ `self.__tokenizer = ppnlp.transformers.BertTokenizer.from_pretrained("bert-base-chinese")`：
+  调用ppnlp.transformers.BertTokenizer进行数据处理，tokenizer可以把原始输入文本转化成模型model可接受的输入数据格式
+
++ `self.__model=self.__model.from_pretrained(self.__load_path)`：
+  从`__load_path`加载模型进入
+
+##### 2. `__convert_example(self,example,tokenizer,label_list,max_seq_length=256,is_test=False)`说明：
++ `example`
+
+## 工具类代码
+
+### MainModule.py
+
+#### 一、主要参数：
+
+##### 各项参数：
++ `__result1_threshold= 57.75`：结果1的阈值
++ `__entropy_threshold=0.0752`：熵率的阈值
++ `__score1=__result1_threshold`
++ `__score2=__score1+(130*0.7-__score1)/3`
++ `__score3=__score2+(130*0.7-__score2)/3`
++ `label_list=['快乐','恐惧','愤怒','惊讶','喜爱','厌恶','悲伤']`：情绪标签设置
+
+#### 二、相关函数说明：
+
+##### 1. `__init__`函数说明：
++ 功能：
+  生成类对象时，同时引入`MyModel`中`Classification`中的`bert_model`模型
+
+### FunctionalInterface.py
+
+#### 一、主要参数说明：
+
+#####
