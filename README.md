@@ -261,9 +261,107 @@
 
 #### 二、相关函数说明：
 
-##### 1. `__init__`函数说明：
+##### 1. `__init__(self,model_path="bert_model")`函数说明：
 + 功能：
   生成类对象时，同时引入`MyModel`中`Classification`中的`bert_model`模型
+
+##### 2. `get_result1(self, pro_dict)`函数说明：
+###### 相关参数说明：
++ `weight_list = [-1, 0.5, 1, 0, -1.5, 0.5, 1.3]`：对应上述的`label_list`值，作为计算得分的权重
+
+###### 输出说明：
++ 此函数通过遍历键值对`pro_dict`的各类情感占比，得到得分`result`，再进行四舍五入得到小数点后保留两位的小数结果（负面情绪得分）
+
+##### 3. `get_entropy(self, pro_dict, time_interval=20)`函数说明：
+###### 相关参数：
++ `pi`：作为概率p_i出现，代表某一情绪的占比
++ `total_pi`：作为平均熵出现，按照信息熵计算方法`total_pi += -pi * math.log2(pi)`
++ `time_interval=20`：作为时间间隔的参数出现
+
+###### 主要功能：
++ 功能：
+  将`pi>0`的值输入至`total_pi`计算中，此方法通过遍历输入的`pro_dict`键值对实现
+
++ 输出：
+  `total_pi/time_interval`（熵率）进行四舍五入得到的小数点后保留5位的小数结果
+
+##### 4. `get_pro_dict(self, data)`函数说明：
+###### 相关参数：
++ `data`：读入的用户发言文本列表
+
+###### 主要功能
++ 输出：
+  将`data`中的用户发言文本进行逐一预测，并计算返回`pro_dict`键值对中，最后输出这个情绪占比键值对
+
+##### 5. `get_emotional_homeostasis(self, pro_dict, threshold=0.2)`函数说明：
+###### 相关参数：
++ `pro_dict`：输入的一份情绪占比键值对
++ `threshold`：情绪比重的差值输入设置（用于寻找是否有相差比重较大的情绪）
+
+###### 主要功能：
++ 输出：
+  遍历情绪占比键值对`pro_dict`得到最大（最小）权重占比，之后输出`max_proportion - min_proportion > threshold`的布尔值
+  注：因为“惊讶”情绪在`bert`模型中的判断适应性较差，因此此函数中针对“惊讶”的情绪并不计入比重
+
+##### 6. `risk_assessment(self,user_path="",min_len=1,min_text_num=5)`函数说明：
+###### 相关参数：
++ `min_len`：最小文本长度，`DA.get_dataList`函数使用此参数过滤长度在这之下的文本
++ `min_text_num`：最小文本条数，在结果判断时，为了可靠性考虑，因此要求其发言条数必须大于等于`min_text_num`，才能判断结果
++ `score`：风险得分
+
+###### 主要功能：
++ 根据情绪波动校准：
+  在“悲伤”情绪占比小于等于设置的悲伤占比值域`self.__sadness_proportion_threshold`时，判断其情绪标准差`S`是否大于情绪波动值域`__mood_change_threshold`范围，若低于此范围，那么将`result`（负面情绪得分）再减少10%，否则在原基础上增加10%得分
+
++ 风险得分计算：
+  这里通过下述四分支系统进行计算（特殊情况处理）：
+  1. `result1`低于设置的负面情绪得分阈值`__result1_threshold`或发言信息条数低于上述`min_text_num`值:
+    其危险等级`risk_level`为0，因为此用户当月的情绪总体并不为负面，或者其发言条数不足以支撑我们得出结果
+  2. 判断情绪存在较大占比差距（通过稳态`get_emotional_homeostasis`函数计算）且熵率大于等于熵率阈值`__entropy_threshold`：
+    其风险得分为`result1*1.2`，证明该用户当月的心理状况复杂，且其熵率大于等于所设阈值
+  3. 判断情绪并不存在较大差异，且熵率低于预设范围值：
+    其风险得分为`result1*0.8`，证明该用户当月的情绪差异较小，且其熵率小于所设阈值
+  4. `score=result1`：不属于我们划分的特殊情况，因此不做处理
+
++ 输出：
+  风险等级判断使用类内函数`judge_rank(score)`，输出数字代表
+
+##### 7. `judge_rank(self,score)`函数说明：
+###### 功能：
++ 输出：
+  根据参数`self.__score1, self.__score2, self.__score3`三个函数阈值进行分支输出四个等级：`0, 1, 2, 3`
+
+##### 8. `draw_pie(self,pro_dict,dest_path)`函数说明：
+###### 参数：
++ `pro_dict`：用户的各种情绪及占比键值对
++ `dest_path`：输出图片路径
+
+###### 功能：
++ 输出：由`pro_dict`数据形成饼状图输出
+
+##### 9. `__plot_risk_rank(self,user_name,risk_month,folder_path="风险等级折线图")`函数说明：
+###### 主要参数：
++ `risk_month`：储存“月份：风险等级”的键值对序列
+
+###### 功能：
++ 输出：用户在这几个月份的风险等级变化情况
+
+##### 10. `__maxmin(self,pro_list)`函数说明：
+###### 功能：
++ 输出：两个情绪列表最值
+
+##### 11. `get_standard_deviation(self, pro_dict)`函数说明：
+###### 功能：
++ 输出：返回情绪键值对值的标准差值（保留小数点后两位小数）
+
+#### 三、集成函数说明：
+
+##### 1. `get_risk_rank_plot(self,src_path,min_len=1,dest_folder_path='风险等级折线图')`函数说明：
+###### 主要参数：
++ `risk_month={}`：与此类`__plot_risk_rank`的输入部分作用相同
+
+###### 功能：
++ 输出：将按月划分的用户发言文本转换成对应月份的“风险等级折线图”
 
 ### FunctionalInterface.py
 
