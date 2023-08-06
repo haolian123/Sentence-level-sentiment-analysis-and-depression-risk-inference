@@ -13,9 +13,9 @@ plt.rcParams['axes.unicode_minus'] = False    # 解决中文显示问题
 #Depression risk inference
 class DRI:
     #结果1的阈值
-    __result1_threshold= 57.75
+    __result1_threshold= 58.32
     # 熵率的阈值
-    __entropy_threshold=0.0752
+    __entropy_threshold=0.0762
     #悲伤情绪占比阈值
     __sadness_proportion_threshold=0.65
     #情绪变化阈值
@@ -231,7 +231,7 @@ class DRI:
         for text_file_path in text_file_paths:
              # 进行风险评估
             risk_rank=self.risk_assessment(src_path+'\\'+f'{text_file_path}',min_len=min_len)
-            index1=text_file_path.find('_')
+            index1=text_file_path.rfind('_')
             if index1 <0:
                 index1=0
             index2=text_file_path.rfind('.')
@@ -253,19 +253,28 @@ class DRI:
                 Max=i 
         return Max,Min
     #归一化,传入一个字典
-    def get_standard_deviation(self,pro_dict):
-        # pro_keys=pro_dict.keys()
-        pro_values=pro_dict.values()
-        pro_max,pro_min=self.__maxmin(pro_values)
-        div=pro_max-pro_min
-        if div==0:
-            div=1
-        pro_values=[max((x-pro_min)/div,0) for x in pro_values]
-        mean_u=sum(pro_values)/len(pro_values)
-        S_square=0
-        x_sum=0
+    def get_standard_deviation(self, pro_dict):
+        # 计算标准差的方法
+        # 获取字典中的值
+        pro_values = pro_dict.values()
+        # 获取最大值和最小值
+        pro_max, pro_min = self.__maxmin(pro_values)
+        # 计算差值
+        div = pro_max - pro_min
+        # 如果差值为0，则将其设置为1，以避免除以0的错误
+        if div == 0:
+            div = 1
+        # 对值进行归一化处理
+        pro_values = [max((x - pro_min) / div, 0) for x in pro_values]
+        # 计算均值
+        mean_u = sum(pro_values) / len(pro_values)
+        # 计算方差
+        S_square = 0
+        x_sum = 0
         for x in pro_values:
-            x_sum+=(x-mean_u)*(x-mean_u)
-        S_square=x_sum/len(pro_values)
-        S=round(math.sqrt(S_square),2)
+            x_sum += (x - mean_u) * (x - mean_u)
+        S_square = x_sum / len(pro_values)
+        # 计算标准差
+        S = round(math.sqrt(S_square), 2)
+        # 返回标准差
         return S

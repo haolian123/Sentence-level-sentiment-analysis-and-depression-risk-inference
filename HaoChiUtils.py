@@ -210,10 +210,6 @@ class DataAnalyzer:
         res_dict = {}
         # 遍历标签及其对应的数量
         for key, value in predictions_dict.items():
-            # # 为每个标签创建一个子字典
-            # res_dict[key] = {}
-            # # 将标签的总数量存储到子字典中
-            # res_dict[key]['total'] = value
             # # 计算标签的占比，并保留一位小数
             proportion = round(value / total_cnt , 2)
             # 将占比存储到子字典中
@@ -231,10 +227,10 @@ class DataAnalyzer:
         with open(data_file_path,'r',encoding='utf-8') as f:
             for data_line in f:
                 data_line=data_line.strip().strip('\n')
-                ##文本清洗：删除@或url等无关信息
+                ##文本清洗：删除@、url、标点等无关信息
                 #需要嵌入代码
                 data_line=DataPreprocess.text_clean(text=data_line,has_user_id=False,keep_segmentation=True)
-
+                #筛选大于等于规定长度的文本
                 if data_line is not None and len(data_line) >=min_len:
                     ret_list.append(data_line)
         return ret_list

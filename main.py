@@ -23,8 +23,8 @@ if __name__=='__main__':
     # src_path="SuspectedDepressedUsers\hhfxvbhxtjcckf_20230131 20230629 .txt"
     # rank=tea.risk_rank(src_path)
     # print(rank)
-    dest_path='风险用户预测结果'
-    user_name='shsjxhdjxjd'
+    # dest_path='风险用户预测结果'
+    # user_name='shsjxhdjxjd'
     # # ===========传入一个用户的txt文本文件夹，得到用户的风险等级列表==========
     # src_path=f'风险用户\\{user_name}'
     # rank=tea.risk_rank_list(src_path)
@@ -32,22 +32,22 @@ if __name__=='__main__':
 
 
     
-    # =========传入一个用户的txt文本文件夹，得到用户的风险等级折线图===========
-    src_path=f'风险用户\\{user_name}'
-    tea.risk_rank_plot(src_folder_path=src_path,dest_folder_path=f'风险用户预测结果\\{user_name}')
+    # # =========传入一个用户的txt文本文件夹，得到用户的风险等级折线图===========
+    # src_path=f'风险用户\\{user_name}'
+    # tea.risk_rank_plot(src_folder_path=src_path,dest_folder_path=f'风险用户预测结果\\{user_name}')
 
 
-    # ======传入一个用户的txt文本文件夹，将情绪预测结果和情绪占比写入一个文件夹中=========
-    src_path=f'风险用户\\{user_name}'
-    tea.batch_sentiment_proportion(src_path,f'风险用户预测结果\\{user_name}')
+    # # ======传入一个用户的txt文本文件夹，将情绪预测结果和情绪占比写入一个文件夹中=========
+    # src_path=f'风险用户\\{user_name}'
+    # tea.batch_sentiment_proportion(src_path,f'风险用户预测结果\\{user_name}')
 
-    # # ==========传入一个包含多个用户文本文件夹的文件夹，得到所有用户的风险等级折线图=======
-    # src_path='正常用户'
-    # tea.batch_risk_rank_plot(src_path,dest_folder_path='batch风险等级折线图')
+    # ==========传入一个包含多个用户文本文件夹的文件夹，得到所有用户的风险等级折线图=======
+    # src_path='测试数据\8.5\yyz_cache'
+    # tea.batch_risk_rank_plot(src_path,dest_folder_path='结果\\风险等级折线图8.5\\风险用户')
 
-    # ============传入一个包含多个用户文本的文件夹，得到所有用户的情绪占比饼状图=========
-    src_path=f'风险用户\\{user_name}'
-    tea.batch_sentiment_ratio_pie(src_folder_path=src_path,dest_folder_path=f'风险用户预测结果\\{user_name}\\情绪占比饼状图')
+    # # ============传入一个包含多个用户文本或一个用户多个文本的文件夹，得到所有用户的情绪占比饼状图=========
+    # src_path=f'测试数据\\8.5\\yyz_cache\\ammm18'
+    # tea.batch_sentiment_ratio_pie(src_folder_path=src_path,dest_folder_path=f'结果\\情绪占比饼状图8.5')
 
     
 
