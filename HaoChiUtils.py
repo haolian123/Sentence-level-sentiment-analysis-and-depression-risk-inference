@@ -63,18 +63,22 @@ class DataPreprocess:
         # 去除表情符号
         text = re.sub(r"\[\S+?\]", "", text)
 
-        #去除中文标点
-        # 使用re.sub()函数将标点符号替换为空格
-        text = re.sub(r'[^\w\s]', ' ', text)
+       
         
         # 去除话题标签
         text = re.sub(r"#\S+#", "", text)
         
+        # 去除数字
+        text = re.sub(r'\d+', '', text)
+
+         #去除中文标点
+        # 使用re.sub()函数将标点符号替换为空格
+        text = re.sub(r'[^\w\s]', ' ', text)
+
         # 去除多余的空格
         text = re.sub(r"(\s)+", r"\1", text)
         
-        # 去除数字
-        text = re.sub(r'\d+', '', text)
+        
 
         for x in self.__stop_terms:
             text = text.replace(x, "")
@@ -148,7 +152,7 @@ class DataAnalyzer:
     def __init__(self) -> None:
         pass
 
-
+    #接受tsv文件
     #划分数据集为测试集、验证集、训练集
     @classmethod
     def split_dataSet(self,dataSet_path='dataSet.tsv'):
@@ -234,3 +238,41 @@ class DataAnalyzer:
                 if data_line is not None and len(data_line) >=min_len:
                     ret_list.append(data_line)
         return ret_list
+
+
+    #计算准确率
+    #传入真实和预测列表
+    #返回准确率，保留4位小数
+    @classmethod
+    def get_score(self,truth_label,predict_label):
+        assert len(truth_label)==len(predict_label),'列表长度不一致！'
+        cnt=0
+        for i in range(len(truth_label)):
+            if truth_label[i]==predict_label[i]:
+                cnt+=1
+
+        return round(cnt/len(truth_label),4)
+
+
+    #根据正负样本计算准确率、召回率、精确率
+
+    #计算准确率
+    def get_score(self,TP,FP,FN,TN):
+        res=(TP+TN)/(TP+FP+FN+TN)
+        return round(res,4)
+
+
+
+    #计算召回率
+    def get_recall(self,TP,FN):
+        res=TP/(TP+FN)
+        return round(res,4)
+
+
+
+    #计算准确率
+    def get_precision(self,TP,FP):
+        res=TP/(FP+TP)
+        return round(res,4)
+    
+

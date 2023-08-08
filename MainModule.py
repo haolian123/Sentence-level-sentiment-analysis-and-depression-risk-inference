@@ -98,11 +98,6 @@ class DRI:
             return True
         # 情绪稳态False
         return False
-        # if max_pi-min_pi>threshold:
-        #     return True 
-        # return False
-        
-    # def judge_rank(self,score):
 
 
     #风险评估
@@ -147,9 +142,7 @@ class DRI:
 
         # 判断风险等级
         risk_level=self.judge_rank(score)
-        # print("分数=",score)
-        # print("score2=",self.__score2)
-        # print("score3=",self.__score3)
+
         return risk_level
 
     #分数转化为风险等级
@@ -169,8 +162,7 @@ class DRI:
         probs = list(pro_dict.values())
 
         # 自定义颜色列表
-        # colors = ['skyblue', 'lightgreen', 'lightcoral', 'orange', 'pink', 'lightgrey', 'gold']
-        # colors = ['red', 'orange', 'yellow', 'violet', 'blue', 'indigo','green']
+      
         colors = ['#FF6347', '#FFD700', '#FFFF00', '#32CD32', '#B0E0E6', '#6495ED', '#9932CC']
         # colors = cm.GnBu(np.arange(len(labels),0,-2) / len(labels))
         # 自定义偏移量列表
@@ -181,8 +173,6 @@ class DRI:
         plt.title('情绪占比',fontsize=20,fontfamily='KaiTi')
 
         plt.legend(loc='lower right')
-        # 创建文件夹
-        # os.makedirs(folder_path, exist_ok=True)
 
         # 保存图像
         save_path=dest_path
@@ -221,8 +211,7 @@ class DRI:
         #提取用户名
         index1=src_path.rfind('\\')
         index1=max(index1,-1)
-        # print('index1=',index1)
-        # print('index2=',index2)
+
         user_name=src_path[index1+1:]
         text_file_paths=os.listdir(src_path)
         #按时间升序排序
@@ -242,7 +231,7 @@ class DRI:
         self.__plot_risk_rank(user_name=user_name,risk_month=risk_month,folder_path=dest_folder_path)
 
     #计算得到情绪占比标准差
-    #计算情绪变化阈值
+    #得到最大值和最小非零值
     def __maxmin(self,pro_list):
         Max=0
         Min=1
@@ -252,9 +241,11 @@ class DRI:
             if i>Max:
                 Max=i 
         return Max,Min
+    
+    # 计算标准差的方法
     #归一化,传入一个字典
     def get_standard_deviation(self, pro_dict):
-        # 计算标准差的方法
+        
         # 获取字典中的值
         pro_values = pro_dict.values()
         # 获取最大值和最小值
