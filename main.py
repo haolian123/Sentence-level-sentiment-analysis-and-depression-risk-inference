@@ -55,4 +55,9 @@ if __name__=='__main__':
 
 
     
-
+    #用户风险评级
+    src_folder_path=f"测试数据\8.5\yyz_cache"
+    user_list=os.listdir(src_folder_path)
+    for user in user_list:
+        level=tea.risk_level_assessment(src_folder_path=src_folder_path+'\\'+user)
+        print(f"{user}的风险等级为：{level}")

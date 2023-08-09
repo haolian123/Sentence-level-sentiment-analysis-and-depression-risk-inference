@@ -215,7 +215,11 @@ class DataAnalyzer:
         # 遍历标签及其对应的数量
         for key, value in predictions_dict.items():
             # # 计算标签的占比，并保留一位小数
-            proportion = round(value / total_cnt , 2)
+            proportion=0
+            if total_cnt!=0:
+                proportion = round(value / total_cnt , 2)
+            else:
+                proportion=0
             # 将占比存储到子字典中
             res_dict[key] = proportion
         # 返回标签及其对应的占比字典
