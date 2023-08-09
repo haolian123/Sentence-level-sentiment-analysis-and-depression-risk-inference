@@ -366,5 +366,59 @@
 ### FunctionalInterface.py
 
 #### 一、主要参数说明：
++ 
 
-#####
+##### 1. `__init__(self) `函数：
+###### 功能：
++ 将模型`bert_model`由`MainModel`导入
+
+##### 2. `sentiment_proportion(self,src_path,dest_path='情绪预测结果',min_len=1)`函数：
+###### 主要参数：
++ `pro_dict`：情绪预测及占比结果
+
+###### 功能：
++ 输出：
+  从`src_path`引入数据使用函数`myClassification.get_predict_result`进行预测，再使用`calculate_label_proportions`计算占比，输出到`dest_path`位置
+
+##### 3. `sentiment_ratio_pie(self,src_path,folder_path='情绪占比饼状图',min_len=1)`函数：
+###### 功能：
++ 输出：
+  将`src_path`路径文件由`draw_pie`函数转换成饼状图保存
+
+##### 4. `risk_rank(self,src_path,min_len=1)`函数：
+###### 功能：
++ 输出：
+  将`src_path`的文本文件转换为风险等级
+
+##### 5. `risk_rank_plot(self,src_folder_path,dest_folder_path='风险等级折线图',min_len=1)`函数：
+###### 功能：
++ 输出：
+  将`src_folder_path`转换为风险等级折线图
+
+##### 6. `risk_rank_list(self,src_folder_path,min_len=1)`函数：
+###### 主要参数：
++ `res_rank_list=[]`：记录风险等级的列表
+
+###### 功能：
++ 输出：
+  将`src_folder_path`路径下的文件转换成风险等级列表
+
+##### 7. `emotions_proportion(self,src_path,min_len=1)`函数：
+###### 功能：
++ 输出：
+  将`src_path`转换成情绪预测的键值对
+
+##### 8. `batch_sentiment_proportion(self,src_folder_path,dest_folder_path="情绪预测结果",min_len=1)`函数：
+###### 功能：
++ 输出：
+  从`src_folder_path`导入数据后输出情绪预测结果
+
+##### 9. `batch_risk_rank_plot(self,src_folder_path,dest_folder_path='风险等级折线图',min_len=1)`函数：
+###### 功能：
++ 输出：
+  由用户文件绘制折线图
+
+##### 10. `batch_sentiment_ratio_pie(self,src_folder_path,dest_folder_path='情绪占比饼状图',min_len=1)`函数：
+###### 功能：
++ 输出：
+  由用户文件绘制饼状图
