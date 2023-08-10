@@ -1,8 +1,10 @@
 #项目功能调用接口
 from MainModule import DRI 
 from HaoChiUtils import DataAnalyzer as DA
+from WeiboComments import WeiboCommentCrawler as WCC
 import os
 import math
+import requests
 class TextEmotionAnalyzer:
     def __init__(self) :
         #加载模型
@@ -118,7 +120,7 @@ class TextEmotionAnalyzer:
 
 
 
-
+    #风险评级
     #各项阈值
     # 近3、6、9个月风险等级平均值阈值
     risk_mean_3=1.0769
@@ -218,8 +220,35 @@ class TextEmotionAnalyzer:
         
 
     #主接口，传入用户各月份的文件夹，得到用户的风险评估级别
-
     def risk_level_assessment(self,src_folder_path,min_len=6):
         risk_list=self.risk_rank_list(src_folder_path=src_folder_path,min_len=min_len)
         score=self.__risk_score(risk_list=risk_list)
         return self.__risk_rating(score)
+    
+
+
+    #爬虫接口
+    #传入一个用户uid，爬取用户的文本
+    @classmethod
+    def user_month_comments(self,save_folder_path,user_id,time_counter=9):
+        Session = requests.session()
+        WCC.save_file_months(user_id=user_id,save_folder_path=save_folder_path,time_counter=time_counter,session=Session)
+
+    #获取用户uid列表
+    @classmethod
+    def __get_uid_list(self,src_path):
+        res_list=[]
+        with open(src_path,'r') as f:
+            for line in f:
+                line=line.strip()
+                if(len(line)>0):
+                    res_list.append(line)
+
+        return res_list
+    
+    #指定一个用户uid文件，得到所有用户的文本
+    @classmethod
+    def batch_user_month_comments(self,src_path,save_folder_path,time_counter=9):
+        uid_list=self.__get_uid_list(src_path=src_path)
+        for uid in uid_list:
+             self.user_month_comments(save_folder_path=f"{save_folder_path}\\{uid}",user_id=uid,time_counter=time_counter)
