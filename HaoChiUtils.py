@@ -60,10 +60,14 @@ class DataPreprocess:
         # 去除@用户和回复标记
         text = re.sub(r"(回复)?(//)?\s*@\S*?\s*(:|：| |$)", " ", text)
         
+        # 将表情符号转换为文本描述
+        text = emoji.demojize(text)
+
+
         # 去除表情符号
         text = re.sub(r"\[\S+?\]", "", text)
 
-       
+
         
         # 去除话题标签
         text = re.sub(r"#\S+#", "", text)
@@ -86,8 +90,7 @@ class DataPreprocess:
         # 去除首尾空格
         text = text.strip()
         
-        # 将表情符号转换为文本描述
-        text = emoji.demojize(text)
+
         if keep_segmentation:
             return text
         else:

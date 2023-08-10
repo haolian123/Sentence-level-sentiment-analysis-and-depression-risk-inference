@@ -251,4 +251,4 @@ class TextEmotionAnalyzer:
     def batch_user_month_comments(self,src_path,save_folder_path,time_counter=9):
         uid_list=self.__get_uid_list(src_path=src_path)
         for uid in uid_list:
-             self.user_month_comments(save_folder_path=f"{save_folder_path}\\{uid}",user_id=uid,time_counter=time_counter)
+             self.user_month_comments(save_folder_path=f"{save_folder_path}",user_id=uid,time_counter=time_counter)

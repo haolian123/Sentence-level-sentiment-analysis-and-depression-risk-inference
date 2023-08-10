@@ -60,9 +60,11 @@ if __name__=='__main__':
     # user_list=os.listdir(src_folder_path)
     # for user in user_list:
     #     level=tea.risk_level_assessment(src_folder_path=src_folder_path+'\\'+user)
-    #     print(f"{user}的风险等级为：{level}")
+    #     print(f"{user}的风险等级为：{lev]el}")
 
 
 
     ## 爬取文本
     # TEA.batch_user_month_comments(src_path="uids.txt",save_folder_path="用户爬取文本",time_counter=9)
+
+    TEA.user_month_comments(save_folder_path="用户爬取文本",user_id="7249120863",time_counter=9)
