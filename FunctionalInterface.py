@@ -123,14 +123,17 @@ class TextEmotionAnalyzer:
     #风险评级
     #各项阈值
     # 近3、6、9个月风险等级平均值阈值
-    risk_mean_3=1.0769
-    risk_mean_6=1.5555
-    risk_mean_9=1.5333
+    # risk_mean_3=1.0769
+    # risk_mean_6=1.5555
+    # risk_mean_9=1.5333
+    risk_mean_3=0.7719
+    risk_mean_6=1.0238
+    risk_mean_9=0.9012
 
     # 近3、6、9个月风险等级平均标准差阈值
-    risk_S_3=1.0259
-    risk_S_6=1.0977
-    risk_S_9=1.2934
+    risk_S_3=0.81
+    risk_S_6=0.8342
+    risk_S_9=0.8582
 
 
     #给不同的时间段赋不同分数

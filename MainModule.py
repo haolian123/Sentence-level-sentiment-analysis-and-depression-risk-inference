@@ -13,13 +13,17 @@ plt.rcParams['axes.unicode_minus'] = False    # 解决中文显示问题
 #Depression risk inference
 class DRI:
     #结果1的阈值
-    __result1_threshold= 58.32
+    # __result1_threshold= 58.32
+    __result1_threshold= 44.82
+
     # 熵率的阈值
-    __entropy_threshold=0.0762
+    # __entropy_threshold=0.0762
+    __entropy_threshold=0.0872
+
     #悲伤情绪占比阈值
     __sadness_proportion_threshold=0.65
     #情绪变化阈值
-    __mood_change_threshold=0.333
+    __mood_change_threshold=0.35
 
     #指标
     __score1=__result1_threshold
