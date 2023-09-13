@@ -175,17 +175,35 @@ class TextEmotionAnalyzer:
     def __S_mean_cmp_score(self,S_m,mean_m,score_m,S_threshold,mean_threshold):
         if S_m==-1 or mean_m==-1:
             return 0
-        # 平均值超过，标准差不超过阈值：得到80%分数
-        # 标准差超过，平均值不超过阈值：得到40%分数
-        # 都超过，得到100%分数
-        if mean_m>mean_threshold and  S_m<S_threshold:
-            return score_m*0.8
-        elif mean_m< mean_threshold and S_m > S_threshold:
-            return score_m*0.4
-        elif mean_m>mean_threshold and S_m>S_threshold :
-            return score_m
-        else:
-            return 0
+        
+        #====================初赛版本======================
+        # # 平均值超过，标准差不超过阈值：得到80%分数
+        # # 标准差超过，平均值不超过阈值：得到40%分数
+        # # 都超过，得到100%分数
+        # if mean_m>mean_threshold and  S_m<S_threshold:
+        #     return score_m*0.8
+        # elif mean_m< mean_threshold and S_m > S_threshold:
+        #     return score_m*0.4
+        # elif mean_m>mean_threshold and S_m>S_threshold :
+        #     return score_m
+        # else:
+        #     return 0
+        #=================================================
+
+        #===================2023.9.13更新版本==============
+        score=score_m
+        if mean_m>=mean_threshold and S_m <= S_threshold:
+            pass 
+        elif mean_m>=mean_threshold and S_m >S_threshold:
+            score*=0.8
+        elif mean_m<=mean_threshold and S_m <S_threshold:
+            score*=0.4
+        elif S_m>S_threshold and mean_m < mean_threshold:
+            score=0
+        return score
+        #===================================================
+
+
     #赋分函数
     def __score_weighting(self,score_3,score_6,score_9):
         return score_3,score_6,score_9
