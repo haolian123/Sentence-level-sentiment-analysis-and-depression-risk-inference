@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 class DataPreprocess:
 
     # 指定的停用词
-    __stop_terms = ["展开", "全文", "转发", "显示原图", "原图","显示地图",'转发微博','分享图片']
+    __stop_terms = ["展开", "全文", "显示原图", "显示地图",'转发微博','分享图片']
 
     #停用词表
     __stopwords = []
@@ -82,13 +82,13 @@ class DataPreprocess:
         # 去除多余的空格
         text = re.sub(r"(\s)+", r"\1", text)
         
-        
+        # 去除首尾空格
+        text = text.strip()
 
         for x in self.__stop_terms:
             text = text.replace(x, "")
         
-        # 去除首尾空格
-        text = text.strip()
+
         
 
         if keep_segmentation:
@@ -283,3 +283,6 @@ class DataAnalyzer:
         return round(res,4)
     
 
+if __name__ ==  '__main__':
+    res=DataPreprocess.text_clean("转发微博")
+    print("res=",res)

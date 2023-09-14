@@ -125,49 +125,49 @@ class DRI:
 
 
         #==============================初赛版本===================================
-        # if pro_dict['悲伤']<=self.__sadness_proportion_threshold:
-        #     if S<self.__mood_change_threshold:
-        #         result1*=0.9
-        #     else:
-        #         result1*=1.1
+        if pro_dict['悲伤']<=self.__sadness_proportion_threshold:
+            if S<self.__mood_change_threshold:
+                result1*=0.9
+            else:
+                result1*=1.1
     
-        # score=0
-        # # print("result1=",result1)
-        # #风险评估
-        # if result1 < self.__result1_threshold or len(data_list)<min_text_num:
-        #     # print("小于result1阈值，分数=",result1)
-        #     return 0
+        score=0
+        # print("result1=",result1)
+        #风险评估
+        if result1 < self.__result1_threshold or len(data_list)<min_text_num:
+            # print("小于result1阈值，分数=",result1)
+            return 0
         
-        # elif emotional_homeostasis==True and entropy>=self.__entropy_threshold:
-        #     score=result1*1.2
+        elif emotional_homeostasis==True and entropy>=self.__entropy_threshold:
+            score=result1*1.2
 
-        # elif emotional_homeostasis==False and entropy<self.__entropy_threshold:
-        #     score=result1*0.8
+        elif emotional_homeostasis==False and entropy<self.__entropy_threshold:
+            score=result1*0.8
             
-        # else:
-        #     score=result1
+        else:
+            score=result1
         # =========================================================================
 
 
 
-        #==============================2023.9.13版本===============================
+        # #==============================2023.9.13版本===============================
 
-        if pro_dict['悲伤']<=self.__sadness_proportion_threshold:
-            return 0
+        # if pro_dict['悲伤']<=self.__sadness_proportion_threshold:
+        #     return 0
         
-        elif S<self.__mood_change_threshold and entropy>self.__entropy_threshold:
-            result1*=1.2
+        # elif S<self.__mood_change_threshold and entropy>self.__entropy_threshold:
+        #     result1*=1.2
 
-        elif S<self.__mood_change_threshold and entropy<self.__entropy_threshold \
-        or S>self.__mood_change_threshold and entropy>self.__entropy_threshold:
-            result1=result1*1
+        # elif S<self.__mood_change_threshold and entropy<self.__entropy_threshold \
+        # or S>self.__mood_change_threshold and entropy>self.__entropy_threshold:
+        #     result1=result1*1
 
-        elif S>self.__mood_change_threshold and entropy<self.__entropy_threshold:
-            result1*=0.8
-        score=result1
+        # elif S>self.__mood_change_threshold and entropy<self.__entropy_threshold:
+        #     result1*=0.8
+        # score=result1
 
 
-        #==========================================================================
+        # #==========================================================================
         # 判断风险等级
         risk_level=self.judge_rank(score)
 

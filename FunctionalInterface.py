@@ -8,7 +8,7 @@ import requests
 class TextEmotionAnalyzer:
     def __init__(self) :
         #加载模型
-        self.dri=DRI("bert_model")
+        self.dri=DRI("model\\bert_model")
     
 
     #传入一个用户的txt文本，将情绪预测结果和情绪占比写入txt文本
@@ -176,32 +176,32 @@ class TextEmotionAnalyzer:
         if S_m==-1 or mean_m==-1:
             return 0
         
-        #====================初赛版本======================
-        # # 平均值超过，标准差不超过阈值：得到80%分数
-        # # 标准差超过，平均值不超过阈值：得到40%分数
-        # # 都超过，得到100%分数
-        # if mean_m>mean_threshold and  S_m<S_threshold:
-        #     return score_m*0.8
-        # elif mean_m< mean_threshold and S_m > S_threshold:
-        #     return score_m*0.4
-        # elif mean_m>mean_threshold and S_m>S_threshold :
-        #     return score_m
-        # else:
-        #     return 0
+        #====================2023.8版本======================
+        # 平均值超过，标准差不超过阈值：得到80%分数
+        # 标准差超过，平均值不超过阈值：得到40%分数
+        # 都超过，得到100%分数
+        if mean_m>mean_threshold and  S_m<S_threshold:
+            return score_m*0.8
+        elif mean_m< mean_threshold and S_m > S_threshold:
+            return score_m*0.4
+        elif mean_m>mean_threshold and S_m>S_threshold :
+            return score_m
+        else:
+            return 0
         #=================================================
 
-        #===================2023.9.13更新版本==============
-        score=score_m
-        if mean_m>=mean_threshold and S_m <= S_threshold:
-            pass 
-        elif mean_m>=mean_threshold and S_m >S_threshold:
-            score*=0.8
-        elif mean_m<=mean_threshold and S_m <S_threshold:
-            score*=0.4
-        elif S_m>S_threshold and mean_m < mean_threshold:
-            score=0
-        return score
-        #===================================================
+        # #===================2023.9.13更新版本==============
+        # score=score_m
+        # if mean_m>=mean_threshold and S_m <= S_threshold:
+        #     pass 
+        # elif mean_m>=mean_threshold and S_m >S_threshold:
+        #     score*=0.8
+        # elif mean_m<=mean_threshold and S_m <S_threshold:
+        #     score*=0.4
+        # elif S_m>S_threshold and mean_m < mean_threshold:
+        #     score=0
+        # return score
+        # #===================================================
 
 
     #赋分函数

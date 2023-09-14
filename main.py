@@ -55,12 +55,15 @@ if __name__=='__main__':
 
 
     
-    #用户风险评级
-    src_folder_path=f"文本集\测试数据\8.5\风险用户"
+    # #用户风险评级
+    src_folder_path=f"文本集\测试数据\9.14\风险用户"
+    # src_folder_path=f"文本集\测试数据\9.14\正常用户"
+    risk_dict={0:'无风险',1:"低风险",2:"高风险"}
     user_list=os.listdir(src_folder_path)
     for user in user_list:
-        level=tea.risk_level_assessment(src_folder_path=src_folder_path+'\\'+user)
-        print(f"{user}的风险等级为：{level}")
+        level=tea.risk_level_assessment(src_folder_path=src_folder_path+'\\'+user,min_len=2)
+        # print(f"   {user}  的风险等级为：{risk_dict[level]}")
+        print(f"   {user}  的风险等级为：{level}")
 
 
 

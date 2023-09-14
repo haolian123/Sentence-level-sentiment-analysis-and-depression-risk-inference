@@ -16,7 +16,7 @@ class Classification:
     
 
     #构造函数
-    def __init__(self,load_path="bert_model") :
+    def __init__(self,load_path="model\\tmp_bert_model") :
       
         #选择模型
         self.__model = ppnlp.transformers.BertForSequenceClassification.from_pretrained("bert-base-chinese", num_classes=7)
