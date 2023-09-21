@@ -6,6 +6,7 @@ import os
 import math
 import requests
 class TextEmotionAnalyzer:
+    WCC
     def __init__(self) :
         #加载模型
         self.dri=DRI("model\\bert_model")
@@ -241,6 +242,7 @@ class TextEmotionAnalyzer:
         
 
     #主接口，传入用户各月份的文件夹，得到用户的风险评估级别
+
     def risk_level_assessment(self,src_folder_path,min_len=6):
         risk_list=self.risk_rank_list(src_folder_path=src_folder_path,min_len=min_len)
         score=self.__risk_score(risk_list=risk_list)
@@ -250,13 +252,14 @@ class TextEmotionAnalyzer:
 
     #爬虫接口
     #传入一个用户uid，爬取用户的文本
-    @classmethod
-    def user_month_comments(self,save_folder_path,user_id,time_counter=9):
-        Session = requests.session()
-        WCC.save_file_months(user_id=user_id,save_folder_path=save_folder_path,time_counter=time_counter,session=Session)
 
+    def user_month_comments(self,user_id,time_counter=9):
+        Session = requests.session()
+        # WCC.save_file_months(user_id=user_id,save_folder_path=save_folder_path,time_counter=time_counter,session=Session)
+        wcc=WCC(user_id,time_counter)
+        return wcc.get_data(Session)
     #获取用户uid列表
-    @classmethod
+
     def __get_uid_list(self,src_path):
         res_list=[]
         with open(src_path,'r') as f:
@@ -267,9 +270,24 @@ class TextEmotionAnalyzer:
 
         return res_list
     
-    #指定一个用户uid文件，得到所有用户的文本
-    @classmethod
-    def batch_user_month_comments(self,src_path,save_folder_path,time_counter=9):
-        uid_list=self.__get_uid_list(src_path=src_path)
-        for uid in uid_list:
-             self.user_month_comments(save_folder_path=f"{save_folder_path}",user_id=uid,time_counter=time_counter)
+    # #指定一个用户uid文件，得到所有用户的文本
+    # @classmethod
+    # def batch_user_month_comments(self,src_path,save_folder_path,time_counter=9):
+    #     uid_list=self.__get_uid_list(src_path=src_path)
+    #     for uid in uid_list:
+    #          self.user_month_comments(save_folder_path=f"{save_folder_path}",user_id=uid,time_counter=time_counter)
+
+
+    #输入一个用户的UID，得到风险等级
+
+    def assess(self,uid,count=9,min_len=2):
+        #定义爬取对象
+        user_text_path=self.user_month_comments(uid,count)
+        risk_dict={0:'无风险',1:"低风险",2:"高风险"}
+        # print(user_text_path)
+        level=self.risk_level_assessment(src_folder_path=user_text_path,min_len=min_len)
+        print(f"   用户{uid}  的风险等级为：{risk_dict[level]}")
+        #还需要输出啥在下面加
+
+
+
