@@ -66,7 +66,7 @@ class WeiboCommentCrawler:
 
         items = self.get_items(text)
         if items is None:
-            raise Exception('Items lack!')
+            raise Exception("Item back!")
 
         self.since_id = items['since_id']
         # print('{}\t'.format(self.since_id))
@@ -101,7 +101,10 @@ class WeiboCommentCrawler:
         current_month = ''
         folder_path=""
         while self.timer > 0:
-            page = self._get_request(session)['data']['cards']
+            try:
+                page = self._get_request(session)['data']['cards']
+            except:
+                return folder_path
             for sentence in page:
                 text = dr.sub('', sentence['mblog']['text'])
                 text = self.DP.text_clean(text)

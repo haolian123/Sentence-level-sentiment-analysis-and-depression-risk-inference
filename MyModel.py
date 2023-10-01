@@ -13,8 +13,6 @@ logging.disable(logging.CRITICAL)
 
 class Classification:
     
-    
-
     #构造函数
     def __init__(self,load_path="model\\bert_model") :
       

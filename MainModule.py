@@ -110,6 +110,8 @@ class DRI:
 
 
         #待预测文本列表
+        if(user_path is None):
+            return
         data_list=DA.get_dataList(user_path,min_len=min_len)
 
         #情绪占比

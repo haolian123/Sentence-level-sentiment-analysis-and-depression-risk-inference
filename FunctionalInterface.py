@@ -59,6 +59,7 @@ class TextEmotionAnalyzer:
 
     #传入一个用户的txt文本，得到预测的风险等级
     def risk_rank(self,src_path,min_len=1):
+
         rank=self.dri.risk_assessment(src_path,min_len=min_len)
         return rank
 
@@ -72,6 +73,7 @@ class TextEmotionAnalyzer:
         text_list=os.listdir(src_folder_path)
         #按时间顺序升序排序
         text_list=sorted(text_list)
+        # print(text_list)
         res_rank_list=[]
         for text in text_list:
 
@@ -281,12 +283,15 @@ class TextEmotionAnalyzer:
     #输入一个用户的UID，得到风险等级
 
     def assess(self,uid,count=9,min_len=2):
+
         #定义爬取对象
         user_text_path=self.user_month_comments(uid,count)
+        print("开始对用户进行风险等级判定...")
         risk_dict={0:'无风险',1:"低风险",2:"高风险"}
         # print(user_text_path)
         level=self.risk_level_assessment(src_folder_path=user_text_path,min_len=min_len)
         print(f"   用户{uid}  的风险等级为：{risk_dict[level]}")
+
         #还需要输出啥在下面加
 
 
