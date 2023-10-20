@@ -6,7 +6,7 @@ import os
 import math
 import requests
 class TextEmotionAnalyzer:
-    WCC
+
     def __init__(self) :
         #加载模型
         self.dri=DRI("model\\bert_model")
@@ -292,7 +292,7 @@ class TextEmotionAnalyzer:
         level=self.risk_level_assessment(src_folder_path=user_text_path,min_len=min_len)
         print(f"   用户{uid}  的风险等级为：{risk_dict[level]}")
 
-        #还需要输出啥在下面加
+
 
 
 
