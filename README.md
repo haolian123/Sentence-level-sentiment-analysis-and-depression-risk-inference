@@ -25,14 +25,15 @@ AI Studio 的BML lab V100 16GB版本
 
 ## 接口使用
 
-项目的功能封装于FunctionalInterface.py的类TextEmotionAnalyzer中，实现了以下功能：
+爬取指定UID的微博文本并对其进行抑郁风险推断
 
-1. 爬取指定uid的用户的近9个月微博文档存为txt文件，保存到文件夹中。
-2. 传入一个用户的txt文本文件夹，得到用户的风险等级折线图。
-3. 传入一个用户的txt文本，得到情绪占比饼状图。
-4. 传入一个用户的txt文本文件夹，计算得到用户抑郁风险等级。
-
-具体接口说明见本文档后续说明。
+```python
+from FunctionalInterface import TextEmotionAnalyzer as TEA
+if __name__=='__main__':
+    tea=TEA()
+    uid="7478209878"#测试用例
+    tea.assess(uid)
+```
 
 # 代码文件说明
 
@@ -132,14 +133,11 @@ AI Studio 的BML lab V100 16GB版本
     ```
     if len(month_id) > len(text):
             month_id = month_id[::-1][1:]
+    ```
 ```
-    
-+ 补全信息机制：末尾使用
-
->```
   if len(per_month) != 0:
           li.append(per_month)
-  ```
+```
 + 数据输出：
   + 数据1：发言文本数据（按先后顺序）`list`类型
   + 数据2：记录年月列表，`list`类型
